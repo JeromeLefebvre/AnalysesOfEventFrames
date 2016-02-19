@@ -6,7 +6,7 @@
       <Value Profile="(Default)">localhost</Value>
     </Setting>
     <Setting Name="AFDBName" Type="System.String" Scope="User">
-      <Value Profile="(Default)">test</Value>
+      <Value Profile="(Default)">GenerationofData</Value>
     </Setting>
   </Settings>
 </SettingsFile>
