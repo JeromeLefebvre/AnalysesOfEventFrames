@@ -1,0 +1,8 @@
+c:\users\khashimoto.osi\documents\visual studio 2015\Projects\EventFrameTest\EventFrameTest\bin\Debug\EventFrameTest.exe.config
+c:\users\khashimoto.osi\documents\visual studio 2015\Projects\EventFrameTest\EventFrameTest\bin\Debug\EventFrameTest.exe
+c:\users\khashimoto.osi\documents\visual studio 2015\Projects\EventFrameTest\EventFrameTest\bin\Debug\EventFrameTest.pdb
+c:\users\khashimoto.osi\documents\visual studio 2015\Projects\EventFrameTest\EventFrameTest\bin\Debug\OSIsoft.AFSDK.dll
+c:\users\khashimoto.osi\documents\visual studio 2015\Projects\EventFrameTest\EventFrameTest\bin\Debug\OSIsoft.AFSDK.xml
+c:\users\khashimoto.osi\documents\visual studio 2015\Projects\EventFrameTest\EventFrameTest\obj\Debug\EventFrameTest.csprojResolveAssemblyReference.cache
+c:\users\khashimoto.osi\documents\visual studio 2015\Projects\EventFrameTest\EventFrameTest\obj\Debug\EventFrameTest.exe
+c:\users\khashimoto.osi\documents\visual studio 2015\Projects\EventFrameTest\EventFrameTest\obj\Debug\EventFrameTest.pdb
