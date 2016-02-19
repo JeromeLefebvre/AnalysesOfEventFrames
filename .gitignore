@@ -234,3 +234,11 @@ _Pvt_Extensions
 
 # FAKE - F# Make
 .fake/
+*.exe
+*.pdb
+EventFrameTest/bin/Debug/OSIsoft.AFSDK.dll
+*.cache
+EventFrameTest/obj/Debug/EventFrameTest.csprojResolveAssemblyReference.cache
+*.exe
+EventFrameTest/obj/Debug/EventFrameTest.pdb
+*.exe
