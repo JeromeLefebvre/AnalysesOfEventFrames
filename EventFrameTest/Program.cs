@@ -47,8 +47,6 @@ namespace EventFrameTest
             changedEH = new EventHandler<AFChangedEventArgs>(OnChanged);
             monitoredDB.Changed += changedEH;
             refreshTimer.Start();
-
-            //System.Threading.Thread.Sleep(60 * 5000);
             
             WaitForQuit();
             
