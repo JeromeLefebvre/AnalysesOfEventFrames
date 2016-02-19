@@ -243,3 +243,4 @@ EventFrameTest/obj/Debug/EventFrameTest.csprojResolveAssemblyReference.cache
 EventFrameTest/obj/Debug/EventFrameTest.pdb
 *.exe
 *.exe
+EventFrameTest/bin/Debug/OSIsoft.AFSDK.dll

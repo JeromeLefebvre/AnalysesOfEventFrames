@@ -37,7 +37,7 @@ namespace EventFrameTest.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("test")]
+        [global::System.Configuration.DefaultSettingValueAttribute("GenerationOfData")]
         public string AFDBName {
             get {
                 return ((string)(this["AFDBName"]));
