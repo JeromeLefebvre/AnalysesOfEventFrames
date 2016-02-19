@@ -94,6 +94,5 @@ namespace EventFrameTest
             }
             refreshTimer.Start();
         }
-
     }
 }
