@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<AF xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="OSIsoft.AF.xsd" SchemaVersion="2.0" SoftwareVersion="2.8.0.7323" ExportMode="AllReferences, NoUniqueID" PISystem="JLEFEBVRENEW" Database="GenerationOfData" Description="" Created="2016-02-19T04:26:19.1114945Z" id="5b54952b-1054-44a6-bbe9-0adf3fa30c92" ParentKey="0c8bd695-2962-48f1-8ade-c769ea78521b" ExportedObject="GenerationOfData" ExportedType="AFDatabase" Identity="Database" PIPersist="152 {9895150E-085D-4fcb-A16D-5EF5D2527196} 2\{0c8bd695-2962-48f1-8ade-c769ea78521b}\{5b54952b-1054-44a6-bbe9-0adf3fa30c92}*JLEFEBVRENEW\GenerationOfData">
+<AF xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="OSIsoft.AF.xsd" SchemaVersion="2.0" SoftwareVersion="2.8.0.7323" ExportMode="NoUniqueID" PISystem="JLEFEBVRENEW" Database="GenerationOfData" Description="" Created="2016-02-20T22:34:45.3554666Z" id="5b54952b-1054-44a6-bbe9-0adf3fa30c92" ParentKey="0c8bd695-2962-48f1-8ade-c769ea78521b" ExportedObject="GenerationOfData" ExportedType="AFDatabase" Identity="Database" PIPersist="152 {9895150E-085D-4fcb-A16D-5EF5D2527196} 2\{0c8bd695-2962-48f1-8ade-c769ea78521b}\{5b54952b-1054-44a6-bbe9-0adf3fa30c92}*JLEFEBVRENEW\GenerationOfData">
   <AFDatabase>
     <Name>GenerationOfData</Name>
     <AFAttributeCategory>
-      <Name>Specification</Name>
+      <Name>Statistic</Name>
     </AFAttributeCategory>
     <AFElementCategory>
       <Name>Asset</Name>
@@ -14,7 +14,7 @@
       <InstanceType>EventFrame</InstanceType>
       <AllowElementToExtend>false</AllowElementToExtend>
       <AFAttributeTemplate>
-        <Name>Attribute1</Name>
+        <Name>Sensor</Name>
         <Type>Double</Type>
         <Value type="Double">0</Value>
         <DataReference>PI Point</DataReference>
@@ -31,11 +31,36 @@
         <Value type="AFObject">DataGeneration</Value>
       </AFExtendedProperty>
       <AFAttributeTemplate>
+        <Name>+3 sigma</Name>
+        <Type>Double</Type>
+        <Value type="Double">0</Value>
+        <DataReference>Formula</DataReference>
+        <ConfigString>M=Mean;S=StandardDev;[M+3*S]</ConfigString>
+        <AFAttributeCategoryRef>Statistic</AFAttributeCategoryRef>
+      </AFAttributeTemplate>
+      <AFAttributeTemplate>
+        <Name>-3 sigma</Name>
+        <Type>Double</Type>
+        <Value type="Double">0</Value>
+        <DataReference>Formula</DataReference>
+        <ConfigString>M=Mean;S=StandardDev;[M-3*S]</ConfigString>
+        <AFAttributeCategoryRef>Statistic</AFAttributeCategoryRef>
+      </AFAttributeTemplate>
+      <AFAttributeTemplate>
         <Name>CurrentEndTime</Name>
+        <IsHidden>true</IsHidden>
         <Type>Int16</Type>
         <Value type="Int16">0</Value>
         <DataReference>PI Point</DataReference>
         <ConfigString>\\%@\PI Data Archive|Name%\%Element%.%Attribute%;pointtype=Int16;compdev=0;compdevpercent=0;compressing=0;excdev=0;excdevpercent=0;pointsource=Lab;span=60;typicalvalue=30</ConfigString>
+      </AFAttributeTemplate>
+      <AFAttributeTemplate>
+        <Name>Mean</Name>
+        <Type>Double</Type>
+        <Value type="Double">0</Value>
+        <DataReference>PI Point</DataReference>
+        <ConfigString>\\%Server%\%Element%.Mean;pointtype=Float64;compdev=0;compdevpercent=0;compressing=0;excdev=0;excdevpercent=0;future=1;pointsource=Lab</ConfigString>
+        <AFAttributeCategoryRef>Statistic</AFAttributeCategoryRef>
       </AFAttributeTemplate>
       <AFAttributeTemplate>
         <Name>Sensor</Name>
@@ -44,8 +69,34 @@
         <DataReference>PI Point</DataReference>
         <ConfigString>\\%@\PI Data Archive|Name%\%Element%.%Attribute%;pointtype=Float64;compdev=0;compdevpercent=0;compressing=0;excdev=0;excdevpercent=0;pointsource=Lab</ConfigString>
       </AFAttributeTemplate>
+      <AFAttributeTemplate>
+        <Name>StandardDev</Name>
+        <Type>Double</Type>
+        <Value type="Double">0</Value>
+        <DataReference>PI Point</DataReference>
+        <ConfigString>\\JLEFEBVRENEW?e0e3d8a6-0a4f-44e0-9b8f-02a6160c8aa6\%Element%.StandardDeviation;pointtype=Float64;compressing=0;excdev=0;excdevpercent=0;future=1;pointsource=Lab</ConfigString>
+        <AFAttributeCategoryRef>Statistic</AFAttributeCategoryRef>
+      </AFAttributeTemplate>
       <AFAnalysisTemplate>
-        <Name>Analysis Template</Name>
+        <Name>DataGeneration</Name>
+        <Target>DataGenerationTemplate</Target>
+        <AFAnalysisRule>
+          <AFPlugIn>PerformanceEquation</AFPlugIn>
+          <ConfigString>EndTime := If Second('*') = 0 then Floor(Rand(11,20)) else NoOutput(); // 1 to 20&#xD;
+WillRun := Second('*') &lt;= (60-'{15590165-b3cc-4242-9525-b65f54283850};CurrentEndTime');&#xD;
+a := Pi()/(60 - '{15590165-b3cc-4242-9525-b65f54283850};CurrentEndTime');&#xD;
+HalfSin := If WillRun then Sin(a*Second('*')) else 0;&#xD;
+Fuzzy := If WillRun then Rand(0.0,0.2) else 0;&#xD;
+Output := HalfSin + Fuzzy;</ConfigString>
+          <VariableMapping>EndTime||CurrentEndTime;[GUID]||{15590165-b3cc-4242-9525-b65f54283850};Value||Sensor;[GUID]||{a736e7af-fc7c-4045-8a55-19b86401e7ab};Output||Sensor;[GUID]||{a736e7af-fc7c-4045-8a55-19b86401e7ab};[GUID]||[UNSET];</VariableMapping>
+        </AFAnalysisRule>
+        <AFTimeRule>
+          <AFPlugIn>Periodic</AFPlugIn>
+          <ConfigString>Frequency=1</ConfigString>
+        </AFTimeRule>
+      </AFAnalysisTemplate>
+      <AFAnalysisTemplate>
+        <Name>GenerateEF</Name>
         <Target>DataGenerationTemplate</Target>
         <AFAnalysisRule>
           <AFPlugIn>EventFrame</AFPlugIn>
@@ -56,27 +107,8 @@
 StartTrigger1 := Second('*') = 0;&#xD;
 &#xD;
 @group("End triggers")&#xD;
-EndTrigger := Second('*') &gt;= (60 - '{15590165-b3cc-4242-9525-b65f54283850};CurrentEndTime');</ConfigString>
+EndTrigger := Second('*') &gt;= (60 - '{15590165-b3cc-4242-9525-b65f54283850};CurrentEndTime'); // This sometime leaves some analysis running</ConfigString>
           </AFAnalysisRule>
-        </AFAnalysisRule>
-        <AFTimeRule>
-          <AFPlugIn>Periodic</AFPlugIn>
-          <ConfigString>Frequency=1</ConfigString>
-        </AFTimeRule>
-      </AFAnalysisTemplate>
-      <AFAnalysisTemplate>
-        <Name>DataGeneration</Name>
-        <Target>DataGenerationTemplate</Target>
-        <AFAnalysisRule>
-          <AFPlugIn>PerformanceEquation</AFPlugIn>
-          <ConfigString>S := Second('*');&#xD;
-EndTime := If S = 0 then Floor(Rand(11,20)) else NoOutput();&#xD;
-WillRun := S &lt; (60-'{15590165-b3cc-4242-9525-b65f54283850};CurrentEndTime');&#xD;
-a := Pi()/(60 - '{15590165-b3cc-4242-9525-b65f54283850};CurrentEndTime');&#xD;
-HalfSin := If WillRun then Sin(a*S) else 0;&#xD;
-Fuzzy := If WillRun then Rand(0.1,0.1) else 0;&#xD;
-Output := HalfSin + Fuzzy;</ConfigString>
-          <VariableMapping>EndTime||CurrentEndTime;[GUID]||{15590165-b3cc-4242-9525-b65f54283850};Value||Sensor;[GUID]||{a736e7af-fc7c-4045-8a55-19b86401e7ab};Output||Sensor;[GUID]||{a736e7af-fc7c-4045-8a55-19b86401e7ab};[GUID]||[UNSET];</VariableMapping>
         </AFAnalysisRule>
         <AFTimeRule>
           <AFPlugIn>Periodic</AFPlugIn>
@@ -97,30 +129,33 @@ Output := HalfSin + Fuzzy;</ConfigString>
         <IsConfigurationItem>true</IsConfigurationItem>
         <Type>String</Type>
         <Value type="String">Enter_Your_PIDataArchive_Name</Value>
-        <AFAttributeCategoryRef>Specification</AFAttributeCategoryRef>
       </AFAttributeTemplate>
     </AFElementTemplate>
     <AFElement>
       <Name>DataGeneration</Name>
       <Template>DataGenerationTemplate</Template>
       <AFAttribute>
+        <Name>+3 sigma</Name>
+        <AFAttributeCategoryRef>Statistic</AFAttributeCategoryRef>
+      </AFAttribute>
+      <AFAttribute>
+        <Name>-3 sigma</Name>
+        <AFAttributeCategoryRef>Statistic</AFAttributeCategoryRef>
+      </AFAttribute>
+      <AFAttribute>
         <Name>CurrentEndTime</Name>
-        <DataReference>PI Point</DataReference>
-        <ConfigString>\\JLEFEBVRENEW?e0e3d8a6-0a4f-44e0-9b8f-02a6160c8aa6\DataGeneration.CurrentEndTime?46</ConfigString>
+      </AFAttribute>
+      <AFAttribute>
+        <Name>Mean</Name>
+        <AFAttributeCategoryRef>Statistic</AFAttributeCategoryRef>
       </AFAttribute>
       <AFAttribute>
         <Name>Sensor</Name>
-        <DataReference>PI Point</DataReference>
-        <ConfigString>\\JLEFEBVRENEW?e0e3d8a6-0a4f-44e0-9b8f-02a6160c8aa6\DataGeneration.Sensor?47</ConfigString>
       </AFAttribute>
-      <AFAnalysis>
-        <Name>Analysis Template</Name>
-        <Template>Analysis Template</Template>
-        <Status>Enabled</Status>
-        <Target>
-          <AFElementRef>DataGeneration</AFElementRef>
-        </Target>
-      </AFAnalysis>
+      <AFAttribute>
+        <Name>StandardDev</Name>
+        <AFAttributeCategoryRef>Statistic</AFAttributeCategoryRef>
+      </AFAttribute>
       <AFAnalysis>
         <Name>DataGeneration</Name>
         <Template>DataGeneration</Template>
@@ -133,6 +168,14 @@ Output := HalfSin + Fuzzy;</ConfigString>
           <ConfigString>Frequency=1</ConfigString>
         </AFTimeRule>
       </AFAnalysis>
+      <AFAnalysis>
+        <Name>GenerateEF</Name>
+        <Template>GenerateEF</Template>
+        <Status>Enabled</Status>
+        <Target>
+          <AFElementRef>DataGeneration</AFElementRef>
+        </Target>
+      </AFAnalysis>
     </AFElement>
     <AFElement>
       <Name>PI Data Archive</Name>
@@ -141,7 +184,6 @@ Output := HalfSin + Fuzzy;</ConfigString>
       <AFAttribute>
         <Name>Name</Name>
         <Value type="String">localhost</Value>
-        <AFAttributeCategoryRef>Specification</AFAttributeCategoryRef>
       </AFAttribute>
     </AFElement>
   </AFDatabase>
