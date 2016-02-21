@@ -23,7 +23,7 @@
 	<PB:Dataset id="MODULEDB_DS" PB:Type="57" PB:Context="2" PB:Description="" PB:RefreshInterval="5000" PB:Stepped="False" PB:DSType="3" PB:DSVisible="False">
 	</PB:Dataset>
 	<g id="Trend1" PB:Type="10">
-		<PB:TrendLogical id="Trend1_Logical" PB:ValueScalePosition="1" PB:BackgroundColor="8421504" PB:CurrentTrace="4" PB:DisplayScaleInside="True" PB:EnableScript="True" PB:Enabled="True" PB:EndTime="*+1m" PB:FillColor="16711680" PB:FontBold="False" PB:FontItalic="False" PB:FontName="Arial" PB:FontSize="10" PB:FontStrikethrough="False" PB:FontUnderline="False" PB:Height="1389" PB:IsMultiState="False" PB:Left="-14968" PB:LineColor="16777215" PB:MultipleScales="False" PB:Name="Trend1" PB:PlotTimeStyle="0" PB:Rotation="0" PB:ShowDescription="False" PB:ShowEngUnits="True" PB:ShowGrids="True" PB:ShowTagName="True" PB:ShowServerName="False" PB:ShowTitle="True" PB:ShowTraceMarkers="False" PB:ShowValue="True" PB:StartTime="*-2m" PB:Top="14947" PB:TraceCount="4" PB:TrendTitle="Plot-0" PB:Visible="True" PB:Width="3632">
+		<PB:TrendLogical id="Trend1_Logical" PB:ValueScalePosition="1" PB:BackgroundColor="8421504" PB:CurrentTrace="4" PB:DisplayScaleInside="True" PB:EnableScript="True" PB:Enabled="True" PB:EndTime="*+2M" PB:FillColor="16711680" PB:FontBold="False" PB:FontItalic="False" PB:FontName="Arial" PB:FontSize="10" PB:FontStrikethrough="False" PB:FontUnderline="False" PB:Height="1389" PB:IsMultiState="False" PB:Left="-14968" PB:LineColor="16777215" PB:MultipleScales="False" PB:Name="Trend1" PB:PlotTimeStyle="0" PB:Rotation="0" PB:ShowDescription="False" PB:ShowEngUnits="True" PB:ShowGrids="True" PB:ShowTagName="True" PB:ShowServerName="False" PB:ShowTitle="True" PB:ShowTraceMarkers="False" PB:ShowValue="True" PB:StartTime="*-30s" PB:Top="14947" PB:TraceCount="4" PB:TrendTitle="Plot-0" PB:Visible="True" PB:Width="2894">
 			<PB:TraceElem id="PB:TraceElem_1" PB:ShowLinearRegression="False" PB:ScaleLogarithmic="False" PB:ScaleMax="Autorange" PB:ScaleMin="Autorange" PB:Trace="\\JLEFEBVRENEW\DataGeneration.Sensor" PB:PersistString="95 {4572DB6F-FB4B-4BA4-92E2-1811DAA61D7B} \1\?e0e3d8a6-0a4f-44e0-9b8f-02a6160c8aa6\JLEFEBVRENEW70 {2CA6C7D5-025B-4EF6-9E5E-CCE1AB741C69} \1\?47\DataGeneration.Sensor" PB:ScaleFormat="Database" PB:DisplayDigits="-5" PB:CanonicalNumberFormat="Database" PB:TagInfoType="0">
 			</PB:TraceElem>
 			<PB:TraceElem id="PB:TraceElem_2" PB:ShowLinearRegression="False" PB:ScaleLogarithmic="False" PB:ScaleMax="Autorange" PB:ScaleMin="Autorange" PB:Trace="\\JLEFEBVRENEW\DataGeneration.Mean" PB:PersistString="95 {4572DB6F-FB4B-4BA4-92E2-1811DAA61D7B} \1\?e0e3d8a6-0a4f-44e0-9b8f-02a6160c8aa6\JLEFEBVRENEW68 {2CA6C7D5-025B-4EF6-9E5E-CCE1AB741C69} \1\?73\DataGeneration.Mean" PB:ScaleFormat="Database" PB:DisplayDigits="-5" PB:CanonicalNumberFormat="Database" PB:TagInfoType="0">
@@ -73,62 +73,66 @@
 			<PB:Format id="PB:Format_20" PB:Name="Vert. Minor Grid" PB:LineColor="0" PB:LineStyle="0" PB:LineWidth="1" PB:MarkerStyle="-1">
 			</PB:Format>
 		</PB:TrendLogical>
-		<svg id="Trend1_Graphical" height="1389" width="3632" x="32" y="53">
-			<PB:RefreshData id="Trend1_RefreshData" PB:bEngUnits="True" PB:bLogarithmic="False" PB:bMarkers="False" PB:bTagname="True" PB:bValue="True" PB:fXUnits="13.072222222222222222222222222" PB:iGrdBegX="6" PB:iGrdBegY="41" PB:iGrdHght="1296" PB:iGrdWdth="2353" PB:iMinPerCol="30" PB:iNumTrcs="4" PB:iNumXCols="0" PB:bGrids="True" PB:Updateable="True" PB:iSnglLnHght="33" PB:iScaleWidth="0" PB:bOmitScaleText="False" PB:bOmitTimeText="False">
+		<svg id="Trend1_Graphical" height="1389" width="2894" x="32" y="53">
+			<PB:RefreshData id="Trend1_RefreshData" PB:bEngUnits="True" PB:bLogarithmic="False" PB:bMarkers="False" PB:bTagname="True" PB:bValue="True" PB:fXUnits="10.766666666666666666666666667" PB:iGrdBegX="6" PB:iGrdBegY="41" PB:iGrdHght="1296" PB:iGrdWdth="1615" PB:iMinPerCol="30" PB:iNumTrcs="4" PB:iNumXCols="0" PB:bGrids="True" PB:Updateable="True" PB:iSnglLnHght="33" PB:iScaleWidth="0" PB:bOmitScaleText="False" PB:bOmitTimeText="False">
 			</PB:RefreshData>
-			<rect id="Trend1_Background" x="0" y="0" width="3632" height="1389" fill="#808080">
+			<rect id="Trend1_Background" x="0" y="0" width="2894" height="1389" fill="#808080">
 			</rect>
 			<g id="Trend1_PlotTitleGroup" style="font-family:Arial;font-size:33;stroke:#FFFFFF;fill:#FFFFFF;">
 				<text x="6" y="33" style="font-family:Arial;font-size:33;stroke:#FFFFFF;fill:#FFFFFF;">Plot-0</text>
 			</g>
-			<svg id="Trend1_AxesGroup" height="1296" width="2353" x="6" y="41">
-				<rect id="Trend1_GridBackground" x="0" y="0" width="2353" height="1296" style="fill:#808080;stroke:none;">
+			<svg id="Trend1_AxesGroup" height="1296" width="1615" x="6" y="41">
+				<rect id="Trend1_GridBackground" x="0" y="0" width="1615" height="1296" style="fill:#808080;stroke:none;">
 				</rect>
 				<polyline id="Trend1_VertAxis_1" style="stroke-width:3;fill:none;stroke:#000000;" points="0,0 0,1296">
 				</polyline>
-				<polyline id="Trend1_VertAxis_Last" style="stroke-width:3;fill:none;stroke:#000000;stroke-dasharray:10 10 10 10;" points="2353,0 2353,1296">
+				<polyline id="Trend1_VertAxis_Last" style="stroke-width:3;fill:none;stroke:#000000;stroke-dasharray:10 10 10 10;" points="1615,0 1615,1296">
 				</polyline>
-				<polyline id="Trend1_HorizAxis" style="stroke-width:3;fill:none;stroke:#000000;" points="0,1296 2353,1296">
+				<polyline id="Trend1_HorizAxis" style="stroke-width:3;fill:none;stroke:#000000;" points="0,1296 1615,1296">
 				</polyline>
 			</svg>
-			<svg id="Trend1_GridGroup" height="1296" width="2353" x="6" y="41">
-				<path id="Trend1_HorizGridLine" style="stroke-width:2;stroke:#000000;" d="M275,0 L275,1296">
+			<svg id="Trend1_GridGroup" height="1296" width="1615" x="6" y="41">
+				<path id="Trend1_HorizGridLine" style="stroke-width:2;stroke:#000000;" d="M323,0 L323,1296">
 				</path>
-				<path id="Trend1_HorizGridLine" style="stroke-width:2;stroke:#000000;" d="M667,0 L667,1296">
+				<path id="Trend1_HorizGridLine" style="stroke-width:2;stroke:#000000;" d="M646,0 L646,1296">
 				</path>
-				<path id="Trend1_HorizGridLine" style="stroke-width:2;stroke:#000000;" d="M1059,0 L1059,1296">
+				<path id="Trend1_HorizGridLine" style="stroke-width:2;stroke:#000000;" d="M969,0 L969,1296">
 				</path>
-				<path id="Trend1_HorizGridLine" style="stroke-width:2;stroke:#000000;" d="M1451,0 L1451,1296">
+				<path id="Trend1_HorizGridLine" style="stroke-width:2;stroke:#000000;" d="M1292,0 L1292,1296">
 				</path>
-				<path id="Trend1_HorizGridLine" style="stroke-width:2;stroke:#000000;" d="M1843,0 L1843,1296">
+				<path id="Trend1_VertGridLine" style="stroke-width:2;stroke:#000000" d="M0,1296 L1615,1296">
 				</path>
-				<path id="Trend1_HorizGridLine" style="stroke-width:2;stroke:#000000;" d="M2235,0 L2235,1296">
+				<path id="Trend1_VertGridLine" style="stroke-width:2;stroke:#000000" d="M0,1154.75 L1615,1154.75">
 				</path>
-				<path id="Trend1_VertGridLine" style="stroke-width:2;stroke:#000000" d="M0,1208.97 L2353,1208.97">
+				<path id="Trend1_VertGridLine" style="stroke-width:2;stroke:#000000" d="M0,1013.51 L1615,1013.51">
 				</path>
-				<path id="Trend1_VertGridLine" style="stroke-width:2;stroke:#000000" d="M0,987.54 L2353,987.54">
+				<path id="Trend1_VertGridLine" style="stroke-width:2;stroke:#000000" d="M0,872.26 L1615,872.26">
 				</path>
-				<path id="Trend1_VertGridLine" style="stroke-width:2;stroke:#000000" d="M0,766.1 L2353,766.1">
+				<path id="Trend1_VertGridLine" style="stroke-width:2;stroke:#000000" d="M0,731.02 L1615,731.02">
 				</path>
-				<path id="Trend1_VertGridLine" style="stroke-width:2;stroke:#000000" d="M0,544.66 L2353,544.66">
+				<path id="Trend1_VertGridLine" style="stroke-width:2;stroke:#000000" d="M0,589.77 L1615,589.77">
 				</path>
-				<path id="Trend1_VertGridLine" style="stroke-width:2;stroke:#000000" d="M0,323.22 L2353,323.22">
+				<path id="Trend1_VertGridLine" style="stroke-width:2;stroke:#000000" d="M0,448.52 L1615,448.52">
 				</path>
-				<path id="Trend1_VertGridLine" style="stroke-width:2;stroke:#000000" d="M0,101.79 L2353,101.79">
+				<path id="Trend1_VertGridLine" style="stroke-width:2;stroke:#000000" d="M0,307.28 L1615,307.28">
 				</path>
-				<path id="Trend1_VertGridLine" style="stroke-width:2;stroke:#000000" d="M0,0 L2353,0">
+				<path id="Trend1_VertGridLine" style="stroke-width:2;stroke:#000000" d="M0,166.03 L1615,166.03">
+				</path>
+				<path id="Trend1_VertGridLine" style="stroke-width:2;stroke:#000000" d="M0,24.78 L1615,24.78">
+				</path>
+				<path id="Trend1_VertGridLine" style="stroke-width:2;stroke:#000000" d="M0,0 L1615,0">
 				</path>
 			</svg>
 			<g id="Trend1_XScaleTextGroup" style="font-family:Arial;font-size:33;stroke:#FFFFFF;fill:#FFFFFF;">
-				<text id="Trend1_XScaleTextBegin" x="6" y="1372" style="font-family:Arial;font-size:33;stroke:#FFFFFF;fill:#FFFFFF;">2016/02/21 7:36:09</text>
-				<text id="Trend1_XScaleTextSpan" x="1032" y="1372" style="font-family:Arial;font-size:33;stroke:#FFFFFF;fill:#FFFFFF;">180.00 seconds</text>
-				<text id="Trend1_XScaleTextEnd" x="1996" y="1372" style="font-family:Arial;font-size:33;stroke:#FFFFFF;fill:#FFFFFF;">2016/02/21 7:39:09</text>
+				<text id="Trend1_XScaleTextBegin" x="6" y="1372" style="font-family:Arial;font-size:33;stroke:#FFFFFF;fill:#FFFFFF;">2016/02/21 15:16:30</text>
+				<text id="Trend1_XScaleTextSpan" x="664" y="1372" style="font-family:Arial;font-size:33;stroke:#FFFFFF;fill:#FFFFFF;">150.00 seconds</text>
+				<text id="Trend1_XScaleTextEnd" x="1236" y="1372" style="font-family:Arial;font-size:33;stroke:#FFFFFF;fill:#FFFFFF;">2016/02/21 15:19:00</text>
 			</g>
-			<g id="Trend1_TagNameGroup" transform="translate(2385,43)">
+			<g id="Trend1_TagNameGroup" transform="translate(1647,43)">
 				<circle id="Trend1_0" cx="0.5" cy="17" r="8" style="stroke-width:2;stroke:#00FF00;fill:#00FF00;">
 				</circle>
 				<text id="Trend1_TagName0" x="19.1860465116279" y="33" style="font-family:Arial;font-size:33;stroke:#00FF00;fill:#00FF00;">DataGeneration.Sensor</text>
-				<text id="Trend1_TagValue0" x="19.1860465116279" y="68" style="font-family:Arial;font-size:33;stroke:#00FF00;fill:#00FF00;">-0.01028</text>
+				<text id="Trend1_TagValue0" x="19.1860465116279" y="68" style="font-family:Arial;font-size:33;stroke:#00FF00;fill:#00FF00;">0</text>
 				<text id="Trend1_EngUnits0" x="19.1860465116279" y="103" style="font-family:Arial;font-size:33;stroke:#00FF00;fill:#00FF00;">
 				</text>
 				<circle id="Trend1_1" cx="0.5" cy="122" r="8" style="stroke-width:2;stroke:#00FFFF;fill:none;">
@@ -150,8 +154,8 @@
 				<text id="Trend1_EngUnits3" x="19.1860465116279" y="418" style="font-family:Arial;font-size:33;stroke:#FF00FF;fill:#FF00FF;">
 				</text>
 			</g>
-			<svg id="Trend1_TraceGroup" height="1296" width="2353" style="font-family:Arial;font-size:33;stroke:#FFFFFF;fill:#FFFFFF;" x="6" y="41">
-				<path id="Trend1_Plot0" style="font-family:Arial;font-size:33;stroke:#00FF00;fill:none;stroke-width:2;" d="M0,637.919079959382 L13.0722222222222,681.834108885238 L26.1444444444444,655.092783604627 L39.2166666666667,519.598323918166 L52.2888888888889,437.477615441975 L65.3611111111111,489.903059731533 L78.4333333333333,432.961848831344 L91.5055555555556,439.423538146161 L104.577777777778,396.598249578494 L117.65,311.750210666813 L130.722222222222,153.657187159185 L143.794444444444,299.21829789289 L156.866666666667,104.411149187214 L169.938888888889,209.092871911381 L183.011111111111,222.336764868957 L196.083333333333,101.052064456977 L209.155555555556,153.362953896143 L222.227777777778,64.7469216746136 L235.3,3.32414901919532 L248.372222222222,122.922644894949 L261.444444444444,31.3943182066078 L274.516666666667,192.052249526511 L287.588888888889,197.954735312634 L300.661111111111,200.303527408977 L313.733333333333,154.887178505582 L326.805555555556,202.455657220015 L339.877777777778,247.93850368217 L352.95,315.414714457596 L366.022222222222,266.16815343726 L379.094444444444,172.900790413031 L392.166666666667,340.568603166505 L405.238888888889,290.022507102692 L418.311111111111,387.222317259052 L431.383333333333,434.752210683907 L444.455555555556,539.880417998131 L457.527777777778,508.656215656887 L470.6,660.700646069552 L483.672222222222,580.953885680326 L496.744444444444,767.472420923946 L509.816666666667,772.372103368867 L522.888888888889,822.603239130574 L535.961111111111,791.885547489583 L549.033333333333,976.947837474851 L562.105555555556,1015.74270571183 L575.177777777778,1089.77537252121 L588.25,1012.66216862417 L601.322222222222,1195.6507599171 L614.394444444444,1146.75060147016 L627.466666666667,1208.97219145856 L640.538888888889,1208.97219145856 L653.611111111111,1208.97219145856 L666.683333333333,1131.86706477138 L679.755555555555,1232.76512639523 L692.827777777778,993.097817519176 L705.9,1044.16978375834 L718.972222222222,916.059840092715 L732.044444444444,898.557706322287 L745.116666666667,813.545319304074 L758.188888888889,798.325620804203 L771.261111111111,668.380542172922 L784.333333333333,515.602176296768 L797.405555555556,575.659930700067 L810.477777777778,438.61418771539 L823.55,566.8899530577 L836.622222222222,395.067949544152 L849.694444444444,387.579918688834 L862.766666666667,349.222064331762 L875.838888888889,256.820712857178 L888.911111111111,203.279723991114 L901.983333333333,121.171503196698 L915.055555555556,104.10721270143 L928.127777777778,77.2400515893644 L941.2,153.936453812024 L954.272222222222,49.6066585861246 L967.344444444444,72.5449058566912 L980.416666666667,96.8055521841227 L993.488888888889,4.44420295084529 L1006.56111111111,0 L1019.63333333333,10.3923053514727 L1032.70555555556,161.139040102268 L1045.77777777778,112.66414440459 L1058.85,61.1978533677488 L1071.92222222222,139.281001614738 L1084.99444444444,218.758988808419 L1098.06666666667,190.54454930973 L1111.13888888889,211.600781665022 L1124.21111111111,311.300249225475 L1137.28333333333,411.701097295956 L1150.35555555556,397.593944272966 L1163.42777777778,315.157685904522 L1176.5,551.419850544469 L1189.57222222222,474.290573477374 L1202.64444444444,518.271132635993 L1215.71666666667,688.960056944001 L1228.78888888889,762.216605597949 L1241.86111111111,643.690996062948 L1254.93333333333,719.363143710482 L1268.00555555556,858.325783345257 L1281.07777777778,865.99520436944 L1294.15,979.430065402459 L1307.22222222222,1167.2912518104 L1320.29444444444,1041.58042445741 L1333.36666666667,1270.89562090585 L1346.43888888889,1208.97219145856 L1359.51111111111,1208.97219145856 L1372.58333333333,1208.97219145856 L1385.65555555556,1208.97219145856 L1398.72777777778,1208.97219145856 L1411.8,1208.97219145856 L1424.87222222222,1208.97219145856 L1437.94444444444,1208.97219145856 L1451.01666666667,1296 L1464.08888888889,1220.35432800411 L1568.66666666667,1220.35432800411 " PBD:PtTagName="\\jlefebvrenew\datageneration.sensor">
+			<svg id="Trend1_TraceGroup" height="1296" width="1615" style="font-family:Arial;font-size:33;stroke:#FFFFFF;fill:#FFFFFF;" x="6" y="41">
+				<path id="Trend1_Plot0" style="font-family:Arial;font-size:33;stroke:#00FF00;fill:none;stroke-width:2;" d="M-10.7666666666667,60.3248132378052 L0,60.4998378619375 L10.7666666666667,0 L21.5333333333333,269.96564623342 L32.3,264.512323304797 L43.0666666666667,265.476864266982 L53.8333333333333,240.8174855891 L64.6,364.2335172952 L75.3666666666667,540.792970397303 L86.1333333333333,607.031771208722 L96.9,681.336630423922 L107.666666666667,803.791144178854 L118.433333333333,686.628146105554 L129.2,861.644911005462 L139.966666666667,1079.90933142661 L150.733333333333,1203.29091188462 L161.5,1247.04685261861 L172.266666666667,1241.62515604765 L183.033333333333,1296 L193.8,1296 L204.566666666667,1296 L215.333333333333,1296 L323,1296 " PBD:PtTagName="\\jlefebvrenew\datageneration.sensor">
 				</path>
 				<path id="Trend1_Plot1" style="font-family:Arial;font-size:33;stroke:#00FFFF;fill:none;stroke-width:2;" d="" PBD:PtTagName="\\jlefebvrenew\datageneration.mean">
 				</path>
@@ -160,23 +164,25 @@
 				<path id="Trend1_Plot3" style="font-family:Arial;font-size:33;stroke:#FF00FF;fill:none;stroke-width:2;" d="" PBD:DatasetName="AF2_DS" PBD:DatasetColumn="\\JLEFEBVRENEW\GenerationOfData\DataGeneration|+3 sigma">
 				</path>
 			</svg>
-			<svg id="Trend1_MarkerGroup" height="1296" width="2353" style="" x="6" y="41">
-				<circle id="Trend1_1" cx="353.45" cy="315.914714457596" r="8" style="stroke-width:2;stroke:#00FF00;fill:#00FF00;">
+			<svg id="Trend1_MarkerGroup" height="1296" width="1615" style="" x="6" y="41">
+				<circle id="Trend1_1" cx="43.5666666666667" cy="265.976864266982" r="8" style="stroke-width:2;stroke:#00FF00;fill:#00FF00;">
 				</circle>
-				<circle id="Trend1_1" cx="719.472222222222" cy="916.559840092715" r="8" style="stroke-width:2;stroke:#00FF00;fill:#00FF00;">
+				<circle id="Trend1_1" cx="97.4" cy="681.836630423922" r="8" style="stroke-width:2;stroke:#00FF00;fill:#00FF00;">
 				</circle>
-				<circle id="Trend1_1" cx="1098.56666666667" cy="191.04454930973" r="8" style="stroke-width:2;stroke:#00FF00;fill:#00FF00;">
+				<circle id="Trend1_1" cx="151.233333333333" cy="1203.79091188462" r="8" style="stroke-width:2;stroke:#00FF00;fill:#00FF00;">
 				</circle>
 			</svg>
 			<g id="Trend1_YScaleTextGroup" style="font-family:Arial;font-size:33;stroke:#FFFFFF;fill:#FFFFFF;" transform="translate(8,41)">
-				<text id="Max_0" x="2" y="33">1.09193</text>
-				<text id="Min_0" x="2" y="1290">-0.0786</text>
-				<text x="0" y="1214.22271651106">0</text>
-				<text x="0" y="992.785620059886">0.2</text>
-				<text x="0" y="771.348523608707">0.4</text>
-				<text x="0" y="549.911427157528">0.6</text>
-				<text x="0" y="328.47433070635">0.8</text>
-				<text x="0" y="107.037234255171">1</text>
+				<text id="Max_0" x="2" y="33">0.9175</text>
+				<text id="Min_0" x="2" y="1290">0</text>
+				<text x="0" y="1160.00431312282">0.1</text>
+				<text x="0" y="1018.75810119314">0.2</text>
+				<text x="0" y="877.511889263454">0.3</text>
+				<text x="0" y="736.26567733377">0.4</text>
+				<text x="0" y="595.019465404086">0.5</text>
+				<text x="0" y="453.773253474402">0.6</text>
+				<text x="0" y="312.527041544719">0.7</text>
+				<text x="0" y="171.280829615035">0.8</text>
 			</g>
 		</svg>
 	</g>
