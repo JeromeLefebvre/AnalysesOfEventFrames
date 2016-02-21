@@ -56,7 +56,6 @@ namespace EventFrameTest
 
         internal static void OnChanged(object sender, AFChangedEventArgs e)
         {
-            print("called");
             // Find changes since the last refresh
             List<AFChangeInfo> changes = new List<AFChangeInfo>();
             changes.AddRange(monitoredDB.FindChangedItems(true, int.MaxValue, cookie, out cookie));
