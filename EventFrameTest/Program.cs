@@ -139,10 +139,6 @@ namespace EventFrameTest
             return new AFValue(total / count, time);
         }
 
-        internal static void print<T>(T str)
-        {
-            Console.WriteLine(str);
-        }
         internal static void OnElapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
             // Refreshing Database will cause any external changes to be seen which will
