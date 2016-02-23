@@ -49,6 +49,7 @@ namespace EventFrameTest
             
             WaitForQuit();
             
+            // Clean up
             monitoredDB.Changed -= changedEH;
             refreshTimer.Elapsed -= elapsedEH;
             refreshTimer.Stop();
@@ -63,35 +64,39 @@ namespace EventFrameTest
             // Refresh objects that have been changed.
             AFChangeInfo.Refresh(pisystem, changes);
 
+            // Go over all changes and only continue further if the new object is an newly added event frame of the stated event frame
             foreach (AFChangeInfo info in changes)
             {
                 AFObject myObj = info.FindObject(pisystem, true);
-
+                
                 if (myObj.Identity == AFIdentity.EventFrame && info.Action == AFChangeInfoAction.Added)
                 {
                     AFEventFrame lastestEventFrame = (AFEventFrame)myObj;
                     if (lastestEventFrame.Template.Name == EventFrameTest.Properties.Settings.Default.EFTemplate) {
-                        AFNamedCollectionList<AFEventFrame> recentEventFrames = AFEventFrame.FindEventFrames(monitoredDB,
-                                                                                null,
-                                                                                new AFTime("*"),
-                                                                                0,
-                                                                                100,
-                                                                                AFEventFrameSearchMode.BackwardFromEndTime,
-                                                                                "",
-                                                                                "",
-                                                                                null,
-                                                                                lastestEventFrame.Template,
-                                                                                true);
+
+                        AFNamedCollectionList<AFEventFrame> recentEventFrames = AFEventFrame.FindEventFrames(dataabse: monitoredDB,
+                                                                                                searchRoo: null,
+                                                                                startTime: new AFTime("*"),
+                                                                                startIndex: 0,
+                                                                                maxCount: 100,
+                                                                                searchMode: AFEventFrameSearchMode.BackwardFromEndTime,
+                                                                                nameFilter: "",
+                                                                                referencedElementNameFilter: "",
+                                                                                elemCategory: null,
+                                                                                elemTemplate: lastestEventFrame.Template,
+                                                                                searchFullHierarchy: true);
 
 
 
                         List<AFValues> allTrends = new List<AFValues>();
 
+                        // Get the various, sensor, mean and tag, attributes directly from the element
                         AFElement element = monitoredDB.Elements["DataGeneration"];
                         AFAttribute meanattr = element.Attributes["Mean"];
                         AFAttribute stdattr = element.Attributes["StandardDev"];
                         AFAttribute sensor = element.Attributes["Sensor"];
 
+                        // Get the data from the sensor tag for each event frames
                         foreach (AFEventFrame EF in recentEventFrames)
                         {
                             AFTimeRange range = EF.TimeRange;
@@ -102,6 +107,7 @@ namespace EventFrameTest
                         List<AFValues> allValues = Transpose(allTrends);
                         AFTime first = lastestEventFrame.StartTime;
 
+                        // For each seconds, compute the mean and standard deviation and write them to the data archive
                         int i = 0;
                         foreach (AFValues row in allValues)
                         {
@@ -162,11 +168,11 @@ namespace EventFrameTest
 
         public static List<AFValues> Transpose(List<AFValues> trends)
         {
-            // Does a matrix like transpose on a list of 
+            // Does a matrix like transpose on a list of AFValues
             var longest = trends.Any() ? trends.Max(l => l.Count) : 0;
 
             List<AFValues> outer = new List<AFValues>();
-            for (int i = 0; i < 60; i ++)
+            for (int i = 0; i < longest; i ++)
             {
                 outer.Add(new AFValues());
             }
