@@ -1,3 +1,5 @@
 EventFrameTest/obj/*
 EventFrameTest/bin/*
 .vs/EventFrameTest/v14/.suo
+!EventFrameTest/bin/Release*
+EventFrameTest/bin/Release/OSIsoft.AFSDK*
