@@ -70,49 +70,56 @@ namespace EventFrameTest
                 if (myObj.Identity == AFIdentity.EventFrame && info.Action == AFChangeInfoAction.Added)
                 {
                     AFEventFrame lastestEventFrame = (AFEventFrame)myObj;
-                    AFNamedCollectionList<AFEventFrame> recentEventFrames = AFEventFrame.FindEventFrames(monitoredDB,
-                                                                                                null, 
-                                                                                                new AFTime("*"), 
-                                                                                                0, 
-                                                                                                25, 
-                                                                                                AFEventFrameSearchMode.BackwardFromEndTime, 
-                                                                                                "", 
-                                                                                                "", 
-                                                                                                null, 
-                                                                                                lastestEventFrame.Template, 
-                                                                                                true);
-                    List<AFValues> allTrends = new List<AFValues>();
+                    if (lastestEventFrame.Template.Name == EventFrameTest.Properties.Settings.Default.EFTemplate) {
+                        AFNamedCollectionList<AFEventFrame> recentEventFrames = AFEventFrame.FindEventFrames(monitoredDB,
+                                                                                null,
+                                                                                new AFTime("*"),
+                                                                                0,
+                                                                                100,
+                                                                                AFEventFrameSearchMode.BackwardFromEndTime,
+                                                                                "",
+                                                                                "",
+                                                                                null,
+                                                                                lastestEventFrame.Template,
+                                                                                true);
 
-                    AFElement element = monitoredDB.Elements["DataGeneration"];
-                    AFAttribute meanattr = element.Attributes["Mean"];
-                    AFAttribute stdattr = element.Attributes["StandardDev"];
-                    AFAttribute sensor = element.Attributes["Sensor"];
 
-                    foreach (AFEventFrame EF in recentEventFrames)
-                    {
-                        AFTimeRange range = EF.TimeRange;
-                        AFValues values = sensor.Data.InterpolatedValues(range, new AFTimeSpan(seconds:1), null, null, true);
-                        allTrends.Add(values);
-                    }
 
-                    List<AFValues> allValues = Transpose(allTrends);
-                    AFTime first = lastestEventFrame.StartTime;
+                        List<AFValues> allTrends = new List<AFValues>();
 
-                    int i = 0;
-                    foreach (AFValues row in allValues)
-                    {
-                        AFValue mean = Mean(row, new AFTime (lastestEventFrame.StartTime.UtcSeconds + i));   
-                        meanattr.Data.UpdateValue(mean, AFUpdateOption.Insert);
-                        AFValue std = StandardDeviation(row, new AFTime(lastestEventFrame.StartTime.UtcSeconds + i));
-                        stdattr.Data.UpdateValue(std, AFUpdateOption.Insert);
-                        i++;
-                    }
+                        AFElement element = monitoredDB.Elements["DataGeneration"];
+                        AFAttribute meanattr = element.Attributes["Mean"];
+                        AFAttribute stdattr = element.Attributes["StandardDev"];
+                        AFAttribute sensor = element.Attributes["Sensor"];
+
+                        foreach (AFEventFrame EF in recentEventFrames)
+                        {
+                            AFTimeRange range = EF.TimeRange;
+                            AFValues values = sensor.Data.InterpolatedValues(range, new AFTimeSpan(seconds: 1), null, null, true);
+                            allTrends.Add(values);
+                        }
+
+                        List<AFValues> allValues = Transpose(allTrends);
+                        AFTime first = lastestEventFrame.StartTime;
+
+                        int i = 0;
+                        foreach (AFValues row in allValues)
+                        {
+                            AFValue mean = Mean(row, new AFTime(lastestEventFrame.StartTime.UtcSeconds + i));
+                            meanattr.Data.UpdateValue(mean, AFUpdateOption.Insert);
+                            AFValue std = StandardDeviation(row, new AFTime(lastestEventFrame.StartTime.UtcSeconds + i));
+                            stdattr.Data.UpdateValue(std, AFUpdateOption.Insert);
+                            i++;
+                        }
+                    }                                                                       
                 }
             }
         }
 
         public static AFValue StandardDeviation(AFValues values, AFTime time)
         {
+            // Returns the standard deviation of a collection of AFValues
+            // As the timestamp for each value may vary, a time stamp must also be provided to return an AFValue
             double M = 0.0;
             double S = 0.0;
             int k = 1;
@@ -130,9 +137,12 @@ namespace EventFrameTest
 
         public static AFValue Mean(AFValues values, AFTime time)
         {
+            // Returns the mean of a collection of AFValues
+            // As the timestamp for each value may vary, a timestamp must also be provided to return an AFValue
             double total = 0;
             foreach (AFValue value in values)
             {
+                // The data stored in the attribute is of type Float32, thus possible to convert to double 
                 total += (double)value.Value;
             }
             int count = values.Count;
@@ -152,6 +162,7 @@ namespace EventFrameTest
 
         public static List<AFValues> Transpose(List<AFValues> trends)
         {
+            // Does a matrix like transpose on a list of 
             var longest = trends.Any() ? trends.Max(l => l.Count) : 0;
 
             List<AFValues> outer = new List<AFValues>();
@@ -168,18 +179,6 @@ namespace EventFrameTest
                     i++;
                 }
             }
-            return outer;
-        }
-
-        public static List<List<T>> Transpose_gen<T>(List<List<T>> lists)
-        {
-            var longest = lists.Any() ? lists.Max(l => l.Count) : 0;
-            List<List<T>> outer = new List<List<T>>(longest);
-            for (int i = 0; i < longest; i++)
-                outer.Add(new List<T>(lists.Count));
-            for (int j = 0; j < lists.Count; j++)
-                for (int i = 0; i < lists[j].Count; i++)
-                    outer[i].Add(lists[j][i]);
             return outer;
         }
     }
