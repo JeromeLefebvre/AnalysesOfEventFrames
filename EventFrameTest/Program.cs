@@ -77,6 +77,7 @@ namespace EventFrameTest
             List<AFChangeInfo> changes = new List<AFChangeInfo>();
             changes.AddRange(monitoredDB.FindChangedItems(true, int.MaxValue, cookie, out cookie));
 
+            
             // Refresh objects that have been changed.
             AFChangeInfo.Refresh(pisystem, changes);
 
@@ -88,7 +89,7 @@ namespace EventFrameTest
                 if (myObj.Identity == AFIdentity.EventFrame && info.Action == AFChangeInfoAction.Added)
                 {
                     AFEventFrame lastestEventFrame = (AFEventFrame)myObj;
-                    if (lastestEventFrame.Template.Name == EventFrameTest.Properties.Settings.Default.EFTemplate) {
+                     if (lastestEventFrame.Template.Name == EventFrameTest.Properties.Settings.Default.EFTemplate) {
 
                         AFNamedCollectionList<AFEventFrame> recentEventFrames = AFEventFrame.FindEventFrames(database: monitoredDB,
                                                                                 searchRoot: null,
