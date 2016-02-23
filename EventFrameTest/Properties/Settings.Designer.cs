@@ -23,27 +23,30 @@ namespace EventFrameTest.Properties {
             }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("localhost")]
         public string AFSystemName {
             get {
                 return ((string)(this["AFSystemName"]));
             }
-            set {
-                this["AFSystemName"] = value;
-            }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("GenerationOfData")]
         public string AFDBName {
             get {
                 return ((string)(this["AFDBName"]));
             }
-            set {
-                this["AFDBName"] = value;
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Batch")]
+        public string EFTemplate {
+            get {
+                return ((string)(this["EFTemplate"]));
             }
         }
     }

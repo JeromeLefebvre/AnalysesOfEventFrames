@@ -2,11 +2,14 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="EventFrameTest.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="AFSystemName" Type="System.String" Scope="User">
+    <Setting Name="AFSystemName" Type="System.String" Scope="Application">
       <Value Profile="(Default)">localhost</Value>
     </Setting>
-    <Setting Name="AFDBName" Type="System.String" Scope="User">
+    <Setting Name="AFDBName" Type="System.String" Scope="Application">
       <Value Profile="(Default)">GenerationOfData</Value>
+    </Setting>
+    <Setting Name="EFTemplate" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Batch</Value>
     </Setting>
   </Settings>
 </SettingsFile>
