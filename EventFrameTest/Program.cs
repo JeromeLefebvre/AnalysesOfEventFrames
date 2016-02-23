@@ -74,8 +74,8 @@ namespace EventFrameTest
                     AFEventFrame lastestEventFrame = (AFEventFrame)myObj;
                     if (lastestEventFrame.Template.Name == EventFrameTest.Properties.Settings.Default.EFTemplate) {
 
-                        AFNamedCollectionList<AFEventFrame> recentEventFrames = AFEventFrame.FindEventFrames(dataabse: monitoredDB,
-                                                                                                searchRoo: null,
+                        AFNamedCollectionList<AFEventFrame> recentEventFrames = AFEventFrame.FindEventFrames(database: monitoredDB,
+                                                                                searchRoot: null,
                                                                                 startTime: new AFTime("*"),
                                                                                 startIndex: 0,
                                                                                 maxCount: 100,
