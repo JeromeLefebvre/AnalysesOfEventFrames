@@ -17,8 +17,11 @@
     <Setting Name="ExtendedPropertyValue" Type="System.String" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
-    <Setting Name="EventFrameUse" Type="System.String" Scope="User">
-      <Value Profile="(Default)">recent</Value>
+    <Setting Name="WhichEventFramesToUse" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Recent</Value>
+    </Setting>
+    <Setting Name="NumberOfRecentEventFrames" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">20</Value>
     </Setting>
   </Settings>
 </SettingsFile>

@@ -76,13 +76,25 @@ namespace EventFrameTest.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("recent")]
-        public string EventFrameUse {
+        [global::System.Configuration.DefaultSettingValueAttribute("Recent")]
+        public string WhichEventFramesToUse {
             get {
-                return ((string)(this["EventFrameUse"]));
+                return ((string)(this["WhichEventFramesToUse"]));
             }
             set {
-                this["EventFrameUse"] = value;
+                this["WhichEventFramesToUse"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("20")]
+        public int NumberOfRecentEventFrames {
+            get {
+                return ((int)(this["NumberOfRecentEventFrames"]));
+            }
+            set {
+                this["NumberOfRecentEventFrames"] = value;
             }
         }
     }
