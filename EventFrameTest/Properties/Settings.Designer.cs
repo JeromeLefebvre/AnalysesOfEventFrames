@@ -73,5 +73,17 @@ namespace EventFrameTest.Properties {
                 this["ExtendedPropertyValue"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("recent")]
+        public string EventFrameUse {
+            get {
+                return ((string)(this["EventFrameUse"]));
+            }
+            set {
+                this["EventFrameUse"] = value;
+            }
+        }
     }
 }

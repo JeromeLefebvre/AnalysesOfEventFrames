@@ -102,6 +102,7 @@ namespace EventFrameTest
         {
             Console.WriteLine("event frames updated");
             // Captures all strings with the correct extended property
+            // TODO add funcitonality regarding picking what type of searching you want to do
             eventFrames = new AFNamedCollectionList<AFEventFrame>();
             IList <KeyValuePair<string, AFEventFrame>> searchedEventFrames = AFEventFrame.FindEventFramesByExtendedProperty(monitoredDB, extendedPropertiesKey, extendedPropertiesValues, 100000);
             

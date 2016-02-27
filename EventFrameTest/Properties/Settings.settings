@@ -17,5 +17,8 @@
     <Setting Name="ExtendedPropertyValue" Type="System.String" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
+    <Setting Name="EventFrameUse" Type="System.String" Scope="User">
+      <Value Profile="(Default)">recent</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
