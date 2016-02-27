@@ -11,5 +11,11 @@
     <Setting Name="EFTemplate" Type="System.String" Scope="Application">
       <Value Profile="(Default)">Batch</Value>
     </Setting>
+    <Setting Name="ExtendedPropertyKey" Type="System.String" Scope="User">
+      <Value Profile="(Default)">use</Value>
+    </Setting>
+    <Setting Name="ExtendedPropertyValue" Type="System.String" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

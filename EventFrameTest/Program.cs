@@ -37,6 +37,22 @@ namespace EventFrameTest
         static ElapsedEventHandler elapsedEH = null;
         static EventHandler<AFChangedEventArgs> changedEH = null;
 
+        static AFNamedCollectionList<AFEventFrame> eventFrames = null;
+
+        static string extendedPropertiesKey = EventFrameTest.Properties.Settings.Default.ExtendedPropertyKey;
+        static IEnumerable<string> extendedPropertiesValues = new string[] {EventFrameTest.Properties.Settings.Default.ExtendedPropertyValue};
+
+        static AFAttribute sensor;
+        static List<AFValues> allValues;
+
+        static List<double> means = new List<double> { };
+        static List<double> standardDeviations = new List<double> { };
+
+        static AFAttribute meanattr;
+        static AFAttribute stdattr;
+
+        static AFElementTemplate eventFrameTemplate; 
+
         public static void WaitForQuit()
         {
             do {
@@ -49,6 +65,17 @@ namespace EventFrameTest
             pisystems = new PISystems();
             pisystem = pisystems[EventFrameTest.Properties.Settings.Default.AFSystemName];
             monitoredDB = pisystem.Databases[EventFrameTest.Properties.Settings.Default.AFDBName];
+
+            AFElement element = monitoredDB.Elements["DataGeneration"];
+            sensor = element.Attributes["Sensor"];
+            meanattr = element.Attributes["Mean"];
+            stdattr = element.Attributes["StandardDev"];
+
+            eventFrameTemplate = monitoredDB.ElementTemplates[EventFrameTest.Properties.Settings.Default.EFTemplate];
+
+            CaptureEventFrames();
+            GetAllTrends();
+            computeSatistics();
 
             // Initialize the cookie (bookmark)
             monitoredDB.FindChangedItems(false, int.MaxValue, null, out cookie);
@@ -71,75 +98,114 @@ namespace EventFrameTest
             refreshTimer.Stop();
         }
 
+        internal static void CaptureEventFrames()
+        {
+            Console.WriteLine("event frames updated");
+            // Captures all strings with the correct extended property
+            eventFrames = new AFNamedCollectionList<AFEventFrame>();
+            IList <KeyValuePair<string, AFEventFrame>> searchedEventFrames = AFEventFrame.FindEventFramesByExtendedProperty(monitoredDB, extendedPropertiesKey, extendedPropertiesValues, 100000);
+            
+            foreach(KeyValuePair<string, AFEventFrame> pair in searchedEventFrames)
+            {
+                AFEventFrame frame = pair.Value;
+                eventFrames.Add(frame);
+            }
+
+            int count = eventFrames.Count < 10 ? 10 - eventFrames.Count : 0;
+
+            AFNamedCollectionList<AFEventFrame> recentEventFrames = AFEventFrame.FindEventFrames(database: monitoredDB,
+                                                                    searchRoot: null,
+                                                                    startTime: new AFTime("*"),
+                                                                    startIndex: 0,
+                                                                    maxCount: count,
+                                                                    searchMode: AFEventFrameSearchMode.BackwardFromEndTime,
+                                                                    nameFilter: "",
+                                                                    referencedElementNameFilter: "",
+                                                                    elemCategory: null,
+                                                                    elemTemplate: eventFrameTemplate,
+                                                                    searchFullHierarchy: true);
+            foreach(AFEventFrame frame in recentEventFrames)
+            {
+                eventFrames.Add(frame);
+            }
+            
+        }
+
+        internal static void GetAllTrends()
+        {
+            // Gets all the data for the sensor attribute for the various event frames
+            List<AFValues> allTrends = new List<AFValues>();
+
+            foreach (AFEventFrame EF in eventFrames)
+            {
+                AFTimeRange range = EF.TimeRange;
+                AFValues values = sensor.Data.InterpolatedValues(range, new AFTimeSpan(seconds: 1), null, null, true);
+                allTrends.Add(values);
+            }                                
+            allValues = Transpose(allTrends);
+        }
+
+        internal static void computeSatistics()
+        {
+            means = new List<double> { };
+            standardDeviations = new List<double> { };
+            foreach (AFValues row in allValues)
+            {
+                means.Add(Mean(row));
+                standardDeviations.Add(StandardDeviation(row));
+            }
+        }
+
+        internal static void writeValues(AFTime startTime)
+        {
+            int i = 0;
+            foreach (double value in means)
+            {   
+                AFValue mean = new AFValue(value, new AFTime(startTime.UtcSeconds + i));
+                meanattr.Data.UpdateValue(mean, AFUpdateOption.Insert);
+                i++;
+            }
+            i = 0;
+            foreach (double value in standardDeviations)
+            {
+                AFValue mean = new AFValue(value, new AFTime(startTime.UtcSeconds + i));
+                stdattr.Data.UpdateValue(mean, AFUpdateOption.Insert);
+                i++;
+            }
+        }
+
         internal static void OnChanged(object sender, AFChangedEventArgs e)
         {
             // Find changes since the last refresh
             List<AFChangeInfo> changes = new List<AFChangeInfo>();
             changes.AddRange(monitoredDB.FindChangedItems(true, int.MaxValue, cookie, out cookie));
 
-            
             // Refresh objects that have been changed.
             AFChangeInfo.Refresh(pisystem, changes);
 
             // Go over all changes and only continue further if the new object is an newly added event frame of the stated event frame
             foreach (AFChangeInfo info in changes)
             {
-                AFObject myObj = info.FindObject(pisystem, true);
-                
-                if (myObj.Identity == AFIdentity.EventFrame && info.Action == AFChangeInfoAction.Added)
+                if (info.Identity == AFIdentity.EventFrame )
                 {
-                    AFEventFrame lastestEventFrame = (AFEventFrame)myObj;
-                     if (lastestEventFrame.Template.Name == EventFrameTest.Properties.Settings.Default.EFTemplate) {
-
-                        AFNamedCollectionList<AFEventFrame> recentEventFrames = AFEventFrame.FindEventFrames(database: monitoredDB,
-                                                                                searchRoot: null,
-                                                                                startTime: new AFTime("*"),
-                                                                                startIndex: 0,
-                                                                                maxCount: 100,
-                                                                                searchMode: AFEventFrameSearchMode.BackwardFromEndTime,
-                                                                                nameFilter: "",
-                                                                                referencedElementNameFilter: "",
-                                                                                elemCategory: null,
-                                                                                elemTemplate: lastestEventFrame.Template,
-                                                                                searchFullHierarchy: true);
-
-
-
-                        List<AFValues> allTrends = new List<AFValues>();
-
-                        // Get the various, sensor, mean and tag, attributes directly from the element
-                        AFElement element = monitoredDB.Elements["DataGeneration"];
-                        AFAttribute meanattr = element.Attributes["Mean"];
-                        AFAttribute stdattr = element.Attributes["StandardDev"];
-                        AFAttribute sensor = element.Attributes["Sensor"];
-
-                        // Get the data from the sensor tag for each event frames
-                        foreach (AFEventFrame EF in recentEventFrames)
+                    if (info.Action == AFChangeInfoAction.Added)
+                    {
+                        AFEventFrame lastestEventFrame = (AFEventFrame)info.FindObject(pisystem, true); ;
+                        if (lastestEventFrame.Template.Name == EventFrameTest.Properties.Settings.Default.EFTemplate)
                         {
-                            AFTimeRange range = EF.TimeRange;
-                            AFValues values = sensor.Data.InterpolatedValues(range, new AFTimeSpan(seconds: 1), null, null, true);
-                            allTrends.Add(values);
+                            writeValues(lastestEventFrame.StartTime);
                         }
-
-                        List<AFValues> allValues = Transpose(allTrends);
-                        AFTime first = lastestEventFrame.StartTime;
-
-                        // For each seconds, compute the mean and standard deviation and write them to the data archive
-                        int i = 0;
-                        foreach (AFValues row in allValues)
-                        {
-                            AFValue mean = Mean(row, new AFTime(lastestEventFrame.StartTime.UtcSeconds + i));
-                            meanattr.Data.UpdateValue(mean, AFUpdateOption.Insert);
-                            AFValue std = StandardDeviation(row, new AFTime(lastestEventFrame.StartTime.UtcSeconds + i));
-                            stdattr.Data.UpdateValue(std, AFUpdateOption.Insert);
-                            i++;
-                        }
-                    }                                                                       
-                }
+                    }
+                    else if (info.Action == AFChangeInfoAction.Updated || info.Action == AFChangeInfoAction.Removed)
+                    {
+                        CaptureEventFrames();
+                        computeSatistics();
+                    }                                                                
+                } 
             }
         }
 
-        public static AFValue StandardDeviation(AFValues values, AFTime time)
+        public static double StandardDeviation(AFValues values)
         {
             // Returns the standard deviation of a collection of AFValues
             // As the timestamp for each value may vary, a time stamp must also be provided to return an AFValue
@@ -155,10 +221,10 @@ namespace EventFrameTest
                 k++;
             }
             // S can be zero if all values are identical
-            return new AFValue(S == 0 ? 0 : Math.Sqrt(S / (k - 2)), time);
+            return S == 0 ? 0 : Math.Sqrt(S / (k - 2));
         }
 
-        public static AFValue Mean(AFValues values, AFTime time)
+        public static double Mean(AFValues values)
         {
             // Returns the mean of a collection of AFValues
             // As the timestamp for each value may vary, a timestamp must also be provided to return an AFValue
@@ -169,7 +235,7 @@ namespace EventFrameTest
                 total += (double)value.Value;
             }
             int count = values.Count;
-            return new AFValue(total / count, time);
+            return total / count;
         }
 
         internal static void OnElapsed(object sender, System.Timers.ElapsedEventArgs e)

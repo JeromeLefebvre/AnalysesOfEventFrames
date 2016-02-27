@@ -49,5 +49,29 @@ namespace EventFrameTest.Properties {
                 return ((string)(this["EFTemplate"]));
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("use")]
+        public string ExtendedPropertyKey {
+            get {
+                return ((string)(this["ExtendedPropertyKey"]));
+            }
+            set {
+                this["ExtendedPropertyKey"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public string ExtendedPropertyValue {
+            get {
+                return ((string)(this["ExtendedPropertyValue"]));
+            }
+            set {
+                this["ExtendedPropertyValue"] = value;
+            }
+        }
     }
 }

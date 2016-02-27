@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<AF xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="OSIsoft.AF.xsd" SchemaVersion="2.0" SoftwareVersion="2.8.0.7323" ExportMode="NoUniqueID" PISystem="JLEFEBVRENEW" Database="GenerationOfData" Description="" Created="2016-02-20T22:34:45.3554666Z" id="5b54952b-1054-44a6-bbe9-0adf3fa30c92" ParentKey="0c8bd695-2962-48f1-8ade-c769ea78521b" ExportedObject="GenerationOfData" ExportedType="AFDatabase" Identity="Database" PIPersist="152 {9895150E-085D-4fcb-A16D-5EF5D2527196} 2\{0c8bd695-2962-48f1-8ade-c769ea78521b}\{5b54952b-1054-44a6-bbe9-0adf3fa30c92}*JLEFEBVRENEW\GenerationOfData">
+<AF xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="OSIsoft.AF.xsd" SchemaVersion="2.0" SoftwareVersion="2.8.0.7323" ExportMode="AllReferences, NoUniqueID" PISystem="JLEFEBVRENEW" Database="GenerationOfData" Description="" Created="2016-02-27T02:25:43.8421028Z" id="5b54952b-1054-44a6-bbe9-0adf3fa30c92" ParentKey="0c8bd695-2962-48f1-8ade-c769ea78521b" ExportedObject="GenerationOfData" ExportedType="AFDatabase" Identity="Database" PIPersist="152 {9895150E-085D-4fcb-A16D-5EF5D2527196} 2\{0c8bd695-2962-48f1-8ade-c769ea78521b}\{5b54952b-1054-44a6-bbe9-0adf3fa30c92}*JLEFEBVRENEW\GenerationOfData">
   <AFDatabase>
     <Name>GenerationOfData</Name>
     <AFAttributeCategory>
@@ -77,17 +77,25 @@
         <ConfigString>\\JLEFEBVRENEW?e0e3d8a6-0a4f-44e0-9b8f-02a6160c8aa6\%Element%.StandardDeviation;pointtype=Float64;compressing=0;excdev=0;excdevpercent=0;future=1;pointsource=Lab</ConfigString>
         <AFAttributeCategoryRef>Statistic</AFAttributeCategoryRef>
       </AFAttributeTemplate>
+      <AFAttributeTemplate>
+        <Name>平均</Name>
+        <Type>Double</Type>
+        <Value type="Double">0</Value>
+        <DataReference>Formula</DataReference>
+        <ConfigString>M=Mean;[M]</ConfigString>
+      </AFAttributeTemplate>
       <AFAnalysisTemplate>
         <Name>DataGeneration</Name>
         <Target>DataGenerationTemplate</Target>
         <AFAnalysisRule>
           <AFPlugIn>PerformanceEquation</AFPlugIn>
-          <ConfigString>EndTime := If Second('*') = 0 then Floor(Rand(11,20)) else NoOutput(); // 1 to 20&#xD;
+          <ConfigString>EndTime := 1; // If Second('*') = 0 then Floor(Rand(2,2)) else NoOutput()&#xD;
 WillRun := Second('*') &lt;= (60-'{15590165-b3cc-4242-9525-b65f54283850};CurrentEndTime');&#xD;
 a := Pi()/(60 - '{15590165-b3cc-4242-9525-b65f54283850};CurrentEndTime');&#xD;
 HalfSin := If WillRun then Sin(a*Second('*')) else 0;&#xD;
-Fuzzy := If WillRun then Rand(0.0,0.2) else 0;&#xD;
-Output := HalfSin + Fuzzy;</ConfigString>
+Fuzzy := If WillRun then Normalrnd(0.0,0.1) else 0;&#xD;
+Output := HalfSin + Fuzzy;&#xD;
+Variable1 := ;</ConfigString>
           <VariableMapping>EndTime||CurrentEndTime;[GUID]||{15590165-b3cc-4242-9525-b65f54283850};Value||Sensor;[GUID]||{a736e7af-fc7c-4045-8a55-19b86401e7ab};Output||Sensor;[GUID]||{a736e7af-fc7c-4045-8a55-19b86401e7ab};[GUID]||[UNSET];</VariableMapping>
         </AFAnalysisRule>
         <AFTimeRule>
@@ -144,17 +152,30 @@ EndTrigger := Second('*') &gt;= (60 - '{15590165-b3cc-4242-9525-b65f54283850};Cu
       </AFAttribute>
       <AFAttribute>
         <Name>CurrentEndTime</Name>
+        <DataReference>PI Point</DataReference>
+        <ConfigString>\\JLEFEBVRENEW?e0e3d8a6-0a4f-44e0-9b8f-02a6160c8aa6\DataGeneration.CurrentEndTime;pointtype=Int16;compdev=0;compdevpercent=0;compressing=0;excdev=0;excdevpercent=0;pointsource=Lab;span=60;typicalvalue=30</ConfigString>
       </AFAttribute>
       <AFAttribute>
         <Name>Mean</Name>
+        <DataReference>PI Point</DataReference>
+        <ConfigString>\\JLEFEBVRENEW?e0e3d8a6-0a4f-44e0-9b8f-02a6160c8aa6\DataGeneration.Mean?73</ConfigString>
         <AFAttributeCategoryRef>Statistic</AFAttributeCategoryRef>
       </AFAttribute>
       <AFAttribute>
         <Name>Sensor</Name>
+        <DataReference>PI Point</DataReference>
+        <ConfigString>\\JLEFEBVRENEW?e0e3d8a6-0a4f-44e0-9b8f-02a6160c8aa6\DataGeneration.Sensor;pointtype=Float64;compdev=0;compdevpercent=0;compressing=0;excdev=0;excdevpercent=0;pointsource=Lab</ConfigString>
       </AFAttribute>
       <AFAttribute>
         <Name>StandardDev</Name>
+        <DataReference>PI Point</DataReference>
+        <ConfigString>\\JLEFEBVRENEW?e0e3d8a6-0a4f-44e0-9b8f-02a6160c8aa6\DataGeneration.StandardDeviation?74</ConfigString>
         <AFAttributeCategoryRef>Statistic</AFAttributeCategoryRef>
+      </AFAttribute>
+      <AFAttribute>
+        <Name>平均</Name>
+        <DataReference>Formula</DataReference>
+        <ConfigString>M=Mean;[M]</ConfigString>
       </AFAttribute>
       <AFAnalysis>
         <Name>DataGeneration</Name>
