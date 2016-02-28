@@ -113,8 +113,8 @@ namespace EventFrameTest
 
             CaptureEventFrames();
             GetAllTrends();
-            computeSatistics();
-            writeValues(mostRecent.StartTime);
+            ComputeSatistics();
+            WriteValues(mostRecent.StartTime);
         }
         internal static void CaptureEventFrames()
         {
@@ -167,7 +167,7 @@ namespace EventFrameTest
             allValues = Transpose(allTrends);
         }
 
-        internal static void computeSatistics()
+        internal static void ComputeSatistics()
         {
             means = new List<double> { };
             standardDeviations = new List<double> { };
@@ -178,7 +178,7 @@ namespace EventFrameTest
             }
         }
 
-        internal static void writeValues(AFTime startTime)
+        internal static void WriteValues(AFTime startTime)
         {
             for (int i = 0; i < means.Count; i++)
             {
@@ -211,14 +211,14 @@ namespace EventFrameTest
                         AFEventFrame lastestEventFrame = (AFEventFrame)info.FindObject(pisystem, true); ;
                         if (lastestEventFrame.Template.Name == EventFrameTest.Properties.Settings.Default.EFTemplate)
                         {
-                            writeValues(lastestEventFrame.StartTime);
+                            WriteValues(lastestEventFrame.StartTime);
                         }
                     }
                     else if (info.Action == AFChangeInfoAction.Updated || info.Action == AFChangeInfoAction.Removed)
                     {
                         CaptureEventFrames();
                         CaptureEventFrames();
-                        computeSatistics();
+                        ComputeSatistics();
                     }                                                                
                 } 
             }
