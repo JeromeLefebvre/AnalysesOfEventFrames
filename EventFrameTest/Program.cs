@@ -180,19 +180,15 @@ namespace EventFrameTest
 
         internal static void writeValues(AFTime startTime)
         {
-            int i = 0;
-            foreach (double value in means)
-            {   
-                AFValue mean = new AFValue(value, new AFTime(startTime.UtcSeconds + i));
-                meanattr.Data.UpdateValue(mean, AFUpdateOption.Replace);
-                i++;
-            }
-            i = 0;
-            foreach (double value in standardDeviations)
+            for (int i = 0; i < means.Count; i++)
             {
-                AFValue mean = new AFValue(value, new AFTime(startTime.UtcSeconds + i));
+                AFValue mean = new AFValue(means[i], new AFTime(startTime.UtcSeconds + i));
+                meanattr.Data.UpdateValue(mean, AFUpdateOption.Replace);
+            }
+            for (int i = 0; i < means.Count; i++)
+            {
+                AFValue mean = new AFValue(standardDeviations[i], new AFTime(startTime.UtcSeconds + i));
                 stdattr.Data.UpdateValue(mean, AFUpdateOption.Replace);
-                i++;
             }
         }
 
@@ -274,7 +270,7 @@ namespace EventFrameTest
 
         public static List<AFValues> Transpose(List<AFValues> trends)
         {
-            // Does a matrix like transpose on a list of AFValues
+            // Does a matrix like transpose on a list of trends
             var longest = trends.Any() ? trends.Max(l => l.Count) : 0;
 
             List<AFValues> outer = new List<AFValues>();
@@ -284,11 +280,9 @@ namespace EventFrameTest
             }
             for (int j = 0; j < trends.Count; j++)
             {
-                int i = 0;
-                foreach (AFValue value in trends[j])
+                for (int i = 0; i < trends[j].Count; i++)
                 {
-                    outer[i].Add(value);
-                    i++;
+                    outer[i].Add(trends[j][i]);
                 }
             }
             return outer;
