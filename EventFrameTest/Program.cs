@@ -22,7 +22,6 @@ using OSIsoft.AF;
 using OSIsoft.AF.EventFrame;
 using OSIsoft.AF.Time;
 using OSIsoft.AF.Asset;
-using OSIsoft.AF.PI;
 using OSIsoft.AF.Data;
 
 namespace EventFrameTest
