@@ -39,7 +39,7 @@ namespace EventFrameTest
         static AFNamedCollectionList<AFEventFrame> eventFrames = null;
 
         static string extendedPropertiesKey = EventFrameTest.Properties.Settings.Default.ExtendedPropertyKey;
-        static IEnumerable<string> extendedPropertiesValues = new string[] {EventFrameTest.Properties.Settings.Default.ExtendedPropertyValue};
+        static IEnumerable<string> extendedPropertiesValues = new string[] { EventFrameTest.Properties.Settings.Default.ExtendedPropertyValue };
 
         static AFAttribute sensor;
         static List<AFValues> allValues;
@@ -50,11 +50,12 @@ namespace EventFrameTest
         static AFAttribute meanattr;
         static AFAttribute stdattr;
 
-        static AFElementTemplate eventFrameTemplate; 
+        static AFElementTemplate eventFrameTemplate;
 
         public static void WaitForQuit()
         {
-            do {
+            do
+            {
                 Console.Write("Enter Q to exit the program: ");
             } while (Console.ReadLine() != "Q");
         }
@@ -86,9 +87,9 @@ namespace EventFrameTest
             monitoredDB.Changed += changedEH;
 
             refreshTimer.Start();
-            
+
             WaitForQuit();
-            
+
             // Clean up
             monitoredDB.Changed -= changedEH;
             refreshTimer.Elapsed -= elapsedEH;
@@ -97,17 +98,18 @@ namespace EventFrameTest
 
         internal static void InitialRun()
         {
+            // Populate the mean and standard distribution tags base on the current pending event frame.
             AFNamedCollectionList<AFEventFrame> recentEventFrames = AFEventFrame.FindEventFrames(database: monitoredDB,
-                                        searchRoot: null,
-                                        startTime: new AFTime("*"),
-                                        startIndex: 0,
-                                        maxCount: 1,
-                                        searchMode: AFEventFrameSearchMode.BackwardInProgress,
-                                        nameFilter: "",
-                                        referencedElementNameFilter: "",
-                                        elemCategory: null,
-                                        elemTemplate: eventFrameTemplate,
-                                        searchFullHierarchy: true);
+                                                                                                 searchRoot: null,
+                                                                                                 startTime: new AFTime("*"),
+                                                                                                 startIndex: 0,
+                                                                                                 maxCount: 1,
+                                                                                                 searchMode: AFEventFrameSearchMode.BackwardInProgress,
+                                                                                                 nameFilter: "",
+                                                                                                 referencedElementNameFilter: "",
+                                                                                                 elemCategory: null,
+                                                                                                 elemTemplate: eventFrameTemplate,
+                                                                                                 searchFullHierarchy: true);
             AFEventFrame mostRecent = recentEventFrames[0];
 
             CaptureEventFrames();
@@ -115,34 +117,37 @@ namespace EventFrameTest
             ComputeSatistics();
             WriteValues(mostRecent.StartTime);
         }
+
         internal static void CaptureEventFrames()
         {
-            
             // Captures all strings with the correct extended property
-            // TODO add funcitonality regarding picking what type of searching you want to do
             eventFrames = new AFNamedCollectionList<AFEventFrame>();
             string setting = EventFrameTest.Properties.Settings.Default.WhichEventFramesToUse;
 
-            if (setting == "Recent" || setting == "Both") {
+            if (setting == "Recent" || setting == "Both")
+            {
                 int count = EventFrameTest.Properties.Settings.Default.NumberOfRecentEventFrames;
                 AFNamedCollectionList<AFEventFrame> recentEventFrames = AFEventFrame.FindEventFrames(database: monitoredDB,
-                                                        searchRoot: null,
-                                                        startTime: new AFTime("*"),
-                                                        startIndex: 0,
-                                                        maxCount: count,
-                                                        searchMode: AFEventFrameSearchMode.BackwardFromEndTime,
-                                                        nameFilter: "",
-                                                        referencedElementNameFilter: "",
-                                                        elemCategory: null,
-                                                        elemTemplate: eventFrameTemplate,
-                                                        searchFullHierarchy: true);
+                                                                                                     searchRoot: null,
+                                                                                                     startTime: new AFTime("*"),
+                                                                                                     startIndex: 0,
+                                                                                                     maxCount: count,
+                                                                                                     searchMode: AFEventFrameSearchMode.BackwardFromEndTime,
+                                                                                                     nameFilter: "",
+                                                                                                     referencedElementNameFilter: "",
+                                                                                                     elemCategory: null,
+                                                                                                     elemTemplate: eventFrameTemplate,
+                                                                                                     searchFullHierarchy: true);
 
-               eventFrames.AddRange(recentEventFrames);
+                eventFrames.AddRange(recentEventFrames);
             }
-            
+
             if (setting == "ExtendedProperties" || setting == "Both")
             {
-                IList<KeyValuePair<string, AFEventFrame>> searchedEventFrames = AFEventFrame.FindEventFramesByExtendedProperty(monitoredDB, extendedPropertiesKey, extendedPropertiesValues, 100000);
+                IList<KeyValuePair<string, AFEventFrame>> searchedEventFrames = AFEventFrame.FindEventFramesByExtendedProperty(database: monitoredDB,
+                                                                                                                               propertyName: extendedPropertiesKey,
+                                                                                                                               values: extendedPropertiesValues,
+                                                                                                                               maxCount: Int32.MaxValue);
 
                 foreach (KeyValuePair<string, AFEventFrame> pair in searchedEventFrames)
                 {
@@ -162,7 +167,7 @@ namespace EventFrameTest
                 AFTimeRange range = EF.TimeRange;
                 AFValues values = sensor.Data.InterpolatedValues(range, new AFTimeSpan(seconds: 1), null, null, true);
                 allTrends.Add(values);
-            }                                
+            }
             allValues = Transpose(allTrends);
         }
 
@@ -203,7 +208,7 @@ namespace EventFrameTest
             // Go over all changes and only continue further if the new object is an newly added event frame of the stated event frame
             foreach (AFChangeInfo info in changes)
             {
-                if (info.Identity == AFIdentity.EventFrame )
+                if (info.Identity == AFIdentity.EventFrame)
                 {
                     if (info.Action == AFChangeInfoAction.Added)
                     {
@@ -218,8 +223,8 @@ namespace EventFrameTest
                         CaptureEventFrames();
                         CaptureEventFrames();
                         ComputeSatistics();
-                    }                                                                
-                } 
+                    }
+                }
             }
         }
 
@@ -273,7 +278,7 @@ namespace EventFrameTest
             var longest = trends.Any() ? trends.Max(l => l.Count) : 0;
 
             List<AFValues> outer = new List<AFValues>();
-            for (int i = 0; i < longest; i ++)
+            for (int i = 0; i < longest; i++)
             {
                 outer.Add(new AFValues());
             }
