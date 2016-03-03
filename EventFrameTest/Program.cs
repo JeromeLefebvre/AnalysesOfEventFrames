@@ -66,7 +66,7 @@ namespace EventFrameTest
             pisystem = pisystems[EventFrameTest.Properties.Settings.Default.AFSystemName];
             monitoredDB = pisystem.Databases[EventFrameTest.Properties.Settings.Default.AFDBName];
 
-            AFElement element = monitoredDB.Elements["DataGeneration"];
+            AFElement element = monitoredDB.Elements["DataStatistic"];
             sensor = element.Attributes["Sensor"];
             meanattr = element.Attributes["Mean"];
             stdattr = element.Attributes["StandardDev"];
