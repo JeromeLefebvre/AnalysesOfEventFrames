@@ -34,10 +34,10 @@ namespace EventFrameTest.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("GenerationOfData")]
-        public string AFDBName {
+        [global::System.Configuration.DefaultSettingValueAttribute("DataStatistics")]
+        public string AFStatisticsDB {
             get {
-                return ((string)(this["AFDBName"]));
+                return ((string)(this["AFStatisticsDB"]));
             }
         }
         
@@ -88,13 +88,37 @@ namespace EventFrameTest.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("4")]
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
         public int NumberOfRecentEventFrames {
             get {
                 return ((int)(this["NumberOfRecentEventFrames"]));
             }
             set {
                 this["NumberOfRecentEventFrames"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("GenerationOfData")]
+        public string AFDataDB {
+            get {
+                return ((string)(this["AFDataDB"]));
+            }
+            set {
+                this["AFDataDB"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("sensor")]
+        public string EFProperty {
+            get {
+                return ((string)(this["EFProperty"]));
+            }
+            set {
+                this["EFProperty"] = value;
             }
         }
     }

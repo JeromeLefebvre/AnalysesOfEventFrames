@@ -29,7 +29,8 @@ namespace EventFrameTest
     class Program
     {
         static Timer refreshTimer = new Timer(1000);
-        static AFDatabase monitoredDB = null;
+        static AFDatabase dataDB = null;
+        static AFDatabase statisticDB = null;
         static object cookie;
         static PISystems pisystems = null;
         static PISystem pisystem = null;
@@ -64,19 +65,20 @@ namespace EventFrameTest
         {
             pisystems = new PISystems();
             pisystem = pisystems[EventFrameTest.Properties.Settings.Default.AFSystemName];
-            monitoredDB = pisystem.Databases[EventFrameTest.Properties.Settings.Default.AFDBName];
+            dataDB = pisystem.Databases[EventFrameTest.Properties.Settings.Default.AFDataDB];
+            statisticDB = pisystem.Databases[EventFrameTest.Properties.Settings.Default.AFStatisticsDB];
 
-            AFElement element = monitoredDB.Elements["DataStatistic"];
-            sensor = element.Attributes["Sensor"];
+            
+            AFElement element = statisticDB.Elements["DataStatistic"];
             meanattr = element.Attributes["Mean"];
             stdattr = element.Attributes["StandardDev"];
 
-            eventFrameTemplate = monitoredDB.ElementTemplates[EventFrameTest.Properties.Settings.Default.EFTemplate];
+            eventFrameTemplate = dataDB.ElementTemplates[EventFrameTest.Properties.Settings.Default.EFTemplate];
 
             InitialRun();
 
             // Initialize the cookie (bookmark)
-            monitoredDB.FindChangedItems(false, int.MaxValue, null, out cookie);
+            dataDB.FindChangedItems(false, int.MaxValue, null, out cookie);
 
             // Initialize the timer, used to refresh the database
             elapsedEH = new System.Timers.ElapsedEventHandler(OnElapsed);
@@ -84,14 +86,14 @@ namespace EventFrameTest
 
             // Set the function to be triggered once a change is detected
             changedEH = new EventHandler<AFChangedEventArgs>(OnChanged);
-            monitoredDB.Changed += changedEH;
+            dataDB.Changed += changedEH;
 
             refreshTimer.Start();
 
             WaitForQuit();
 
             // Clean up
-            monitoredDB.Changed -= changedEH;
+            dataDB.Changed -= changedEH;
             refreshTimer.Elapsed -= elapsedEH;
             refreshTimer.Stop();
         }
@@ -99,7 +101,7 @@ namespace EventFrameTest
         internal static void InitialRun()
         {
             // Populate the mean and standard distribution tags base on the current pending event frame.
-            AFNamedCollectionList<AFEventFrame> recentEventFrames = AFEventFrame.FindEventFrames(database: monitoredDB,
+            AFNamedCollectionList<AFEventFrame> recentEventFrames = AFEventFrame.FindEventFrames(database: dataDB,
                                                                                                  searchRoot: null,
                                                                                                  startTime: new AFTime("*"),
                                                                                                  startIndex: 0,
@@ -112,6 +114,7 @@ namespace EventFrameTest
                                                                                                  searchFullHierarchy: true);
             AFEventFrame mostRecent = recentEventFrames[0];
 
+            sensor = mostRecent.Attributes[EventFrameTest.Properties.Settings.Default.EFProperty];
             CaptureEventFrames();
             GetAllTrends();
             ComputeSatistics();
@@ -127,7 +130,7 @@ namespace EventFrameTest
             if (setting == "Recent" || setting == "Both")
             {
                 int count = EventFrameTest.Properties.Settings.Default.NumberOfRecentEventFrames;
-                AFNamedCollectionList<AFEventFrame> recentEventFrames = AFEventFrame.FindEventFrames(database: monitoredDB,
+                AFNamedCollectionList<AFEventFrame> recentEventFrames = AFEventFrame.FindEventFrames(database: dataDB,
                                                                                                      searchRoot: null,
                                                                                                      startTime: new AFTime("*"),
                                                                                                      startIndex: 0,
@@ -144,7 +147,7 @@ namespace EventFrameTest
 
             if (setting == "ExtendedProperties" || setting == "Both")
             {
-                IList<KeyValuePair<string, AFEventFrame>> searchedEventFrames = AFEventFrame.FindEventFramesByExtendedProperty(database: monitoredDB,
+                IList<KeyValuePair<string, AFEventFrame>> searchedEventFrames = AFEventFrame.FindEventFramesByExtendedProperty(database: dataDB,
                                                                                                                                propertyName: extendedPropertiesKey,
                                                                                                                                values: extendedPropertiesValues,
                                                                                                                                maxCount: Int32.MaxValue);
@@ -184,23 +187,26 @@ namespace EventFrameTest
 
         internal static void WriteValues(AFTime startTime)
         {
+            AFValues projectedMean = new AFValues();
+            AFValues projectedStandardDeviation = new AFValues();
+            
             for (int i = 0; i < means.Count; i++)
             {
-                AFValue mean = new AFValue(means[i], new AFTime(startTime.UtcSeconds + i));
-                meanattr.Data.UpdateValue(mean, AFUpdateOption.Replace);
+                AFTime time = new AFTime(startTime.UtcSeconds + i);
+                AFValue mean = new AFValue(means[i], time);
+                AFValue standardDeviation = new AFValue(standardDeviations[i], time);
+                projectedMean.Add(mean);
+                projectedStandardDeviation.Add(standardDeviation);
             }
-            for (int i = 0; i < means.Count; i++)
-            {
-                AFValue mean = new AFValue(standardDeviations[i], new AFTime(startTime.UtcSeconds + i));
-                stdattr.Data.UpdateValue(mean, AFUpdateOption.Replace);
-            }
+            meanattr.Data.UpdateValues(projectedMean, AFUpdateOption.Replace);
+            stdattr.Data.UpdateValues(projectedStandardDeviation, AFUpdateOption.Replace);            
         }
 
         internal static void OnChanged(object sender, AFChangedEventArgs e)
         {
             // Find changes since the last refresh
             List<AFChangeInfo> changes = new List<AFChangeInfo>();
-            changes.AddRange(monitoredDB.FindChangedItems(true, int.MaxValue, cookie, out cookie));
+            changes.AddRange(dataDB.FindChangedItems(true, int.MaxValue, cookie, out cookie));
 
             // Refresh objects that have been changed.
             AFChangeInfo.Refresh(pisystem, changes);
@@ -265,9 +271,9 @@ namespace EventFrameTest
         {
             // Refreshing Database will cause any external changes to be seen which will
             // result in the triggering of the OnChanged event handler
-            lock (monitoredDB)
+            lock (dataDB)
             {
-                monitoredDB.Refresh();
+                dataDB.Refresh();
             }
             refreshTimer.Start();
         }

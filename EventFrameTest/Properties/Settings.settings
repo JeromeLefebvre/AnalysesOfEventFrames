@@ -5,8 +5,8 @@
     <Setting Name="AFSystemName" Type="System.String" Scope="Application">
       <Value Profile="(Default)">localhost</Value>
     </Setting>
-    <Setting Name="AFDBName" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">GenerationOfData</Value>
+    <Setting Name="AFStatisticsDB" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">DataStatistics</Value>
     </Setting>
     <Setting Name="EFTemplate" Type="System.String" Scope="Application">
       <Value Profile="(Default)">Batch</Value>
@@ -21,7 +21,13 @@
       <Value Profile="(Default)">Recent</Value>
     </Setting>
     <Setting Name="NumberOfRecentEventFrames" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">4</Value>
+      <Value Profile="(Default)">100</Value>
+    </Setting>
+    <Setting Name="AFDataDB" Type="System.String" Scope="User">
+      <Value Profile="(Default)">GenerationOfData</Value>
+    </Setting>
+    <Setting Name="EFProperty" Type="System.String" Scope="User">
+      <Value Profile="(Default)">sensor</Value>
     </Setting>
   </Settings>
 </SettingsFile>
