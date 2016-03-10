@@ -168,7 +168,8 @@ namespace EventFrameTest
             foreach (AFEventFrame EF in eventFrames)
             {
                 AFTimeRange range = EF.TimeRange;
-                AFValues values = sensor.Data.InterpolatedValues(range, new AFTimeSpan(seconds: 1), null, null, true);
+                // need to change the following...
+                AFValues values = sensor.Data.InterpolatedValues(range, new AFTimeSpan(seconds: 1), null, "not BadVal('sinusoid')", false);
                 allTrends.Add(values);
             }
             allValues = Transpose(allTrends);
@@ -243,7 +244,7 @@ namespace EventFrameTest
             int k = 1;
             foreach (AFValue value in values)
             {
-                double rawValue = (double)value.Value;
+                double rawValue = value.ValueAsDouble();
                 double previousM = M;
                 M += (rawValue - previousM) / k;
                 S += (rawValue - previousM) * (rawValue - M);
@@ -261,7 +262,11 @@ namespace EventFrameTest
             foreach (AFValue value in values)
             {
                 // The data stored in the attribute is of type Float32, thus possible to convert to double 
-                total += (double)value.Value;
+                // Any shutdown or bad data is thrown away
+                if (value.IsGood)
+                {
+                    total += value.ValueAsDouble();
+                }
             }
             int count = values.Count;
             return total / count;

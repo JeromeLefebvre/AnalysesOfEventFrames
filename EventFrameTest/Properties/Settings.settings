@@ -9,7 +9,7 @@
       <Value Profile="(Default)">DataStatistics</Value>
     </Setting>
     <Setting Name="EFTemplate" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">Batch</Value>
+      <Value Profile="(Default)">Periodic</Value>
     </Setting>
     <Setting Name="ExtendedPropertyKey" Type="System.String" Scope="User">
       <Value Profile="(Default)">use</Value>
@@ -21,13 +21,13 @@
       <Value Profile="(Default)">Recent</Value>
     </Setting>
     <Setting Name="NumberOfRecentEventFrames" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">100</Value>
+      <Value Profile="(Default)">20</Value>
     </Setting>
     <Setting Name="AFDataDB" Type="System.String" Scope="User">
-      <Value Profile="(Default)">GenerationOfData</Value>
+      <Value Profile="(Default)">SinusoidEF</Value>
     </Setting>
     <Setting Name="EFProperty" Type="System.String" Scope="User">
-      <Value Profile="(Default)">sensor</Value>
+      <Value Profile="(Default)">sinusoid</Value>
     </Setting>
   </Settings>
 </SettingsFile>
