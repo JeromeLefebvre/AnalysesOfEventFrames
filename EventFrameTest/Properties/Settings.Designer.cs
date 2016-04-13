@@ -43,7 +43,7 @@ namespace EventFrameTest.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Periodic")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Batch")]
         public string EFTemplate {
             get {
                 return ((string)(this["EFTemplate"]));
@@ -88,7 +88,7 @@ namespace EventFrameTest.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("20")]
+        [global::System.Configuration.DefaultSettingValueAttribute("40")]
         public int NumberOfRecentEventFrames {
             get {
                 return ((int)(this["NumberOfRecentEventFrames"]));
@@ -100,7 +100,7 @@ namespace EventFrameTest.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("SinusoidEF")]
+        [global::System.Configuration.DefaultSettingValueAttribute("GenerationOfData")]
         public string AFDataDB {
             get {
                 return ((string)(this["AFDataDB"]));
@@ -112,7 +112,7 @@ namespace EventFrameTest.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("sinusoid")]
+        [global::System.Configuration.DefaultSettingValueAttribute("sensor")]
         public string EFProperty {
             get {
                 return ((string)(this["EFProperty"]));

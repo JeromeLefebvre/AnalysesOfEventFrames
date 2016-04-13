@@ -169,7 +169,8 @@ namespace EventFrameTest
             {
                 AFTimeRange range = EF.TimeRange;
                 // need to change the following...
-                AFValues values = sensor.Data.InterpolatedValues(range, new AFTimeSpan(seconds: 1), null, "not BadVal('sinusoid')", false);
+                //AFValues values = sensor.Data.InterpolatedValues(range, new AFTimeSpan(seconds: 1), null, "not BadVal('sinusoid')", false);
+                AFValues values = sensor.Data.InterpolatedValues(range, new AFTimeSpan(seconds: 1), null, "", true);
                 allTrends.Add(values);
             }
             allValues = Transpose(allTrends);
@@ -184,6 +185,7 @@ namespace EventFrameTest
                 means.Add(Mean(row));
                 standardDeviations.Add(StandardDeviation(row));
             }
+            //allValues = null;
         }
 
         internal static void WriteValues(AFTime startTime)
@@ -244,7 +246,7 @@ namespace EventFrameTest
             int k = 1;
             foreach (AFValue value in values)
             {
-                double rawValue = value.ValueAsDouble();
+                double rawValue = (double) value.Value;
                 double previousM = M;
                 M += (rawValue - previousM) / k;
                 S += (rawValue - previousM) * (rawValue - M);
