@@ -67,14 +67,14 @@ namespace EventFrameAnalysis
             dataDB = pisystem.Databases[EventFrameAnalysis.Properties.Settings.Default.AFDataDB];
             statisticDB = pisystem.Databases[EventFrameAnalysis.Properties.Settings.Default.AFStatisticsDB];
 
-            
+
             AFElement element = statisticDB.Elements["DataStatistic"];
-            
+
             meanattr = element.Attributes["Mean"];
             stdattr = element.Attributes["StandardDev"];
 
             // Force a load of the PIPoint references underlying the attributes
-            AFAttributeList attrlist = new AFAttributeList( new[] { meanattr, stdattr });
+            AFAttributeList attrlist = new AFAttributeList(new[] { meanattr, stdattr });
             attrlist.GetPIPoint();
 
             if (!meanattr.PIPoint.IsResolved || !stdattr.PIPoint.IsResolved)
@@ -83,7 +83,7 @@ namespace EventFrameAnalysis
                 Console.ReadLine();
                 return;
             }
-            
+
             eventFrameTemplate = dataDB.ElementTemplates[EventFrameAnalysis.Properties.Settings.Default.EFTemplate];
 
             InitialRun();
@@ -193,17 +193,17 @@ namespace EventFrameAnalysis
             standardDeviations.Clear();
             foreach (AFValues row in allValues)
             {
-                means.Add(Statistics.Mean(row));
-                standardDeviations.Add(Statistics.StandardDeviation(row));
+                IDictionary<AFSummaryTypes, AFValue> meanAndStddev = statistics(row);
+                means.Add((double)meanAndStddev[AFSummaryTypes.Average].Value);
+                standardDeviations.Add((double)meanAndStddev[AFSummaryTypes.StdDev].Value);
             }
-            //allValues = null;
         }
 
         internal static void WriteValues(AFTime startTime)
         {
             AFValues projectedMean = new AFValues();
             AFValues projectedStandardDeviation = new AFValues();
-            
+
             for (int i = 0; i < means.Count; i++)
             {
                 AFTime time = new AFTime(startTime.UtcSeconds + i);
@@ -214,7 +214,7 @@ namespace EventFrameAnalysis
             }
 
             meanattr.Data.UpdateValues(projectedMean, AFUpdateOption.Replace);
-            stdattr.Data.UpdateValues(projectedStandardDeviation, AFUpdateOption.Replace);            
+            stdattr.Data.UpdateValues(projectedStandardDeviation, AFUpdateOption.Replace);
         }
 
         internal static void OnChanged(object sender, AFChangedEventArgs e)
@@ -278,6 +278,17 @@ namespace EventFrameAnalysis
                 }
             }
             return outer;
+        }
+
+        public static IDictionary<AFSummaryTypes, AFValue> statistics(AFValues values)
+        {
+            AFTimeRange range = new AFTimeRange(values.Min(value => value.Timestamp), values.Max(value => value.Timestamp));
+            IDictionary<AFSummaryTypes, AFValue> summary = values.Summary(range,
+                                                                          AFSummaryTypes.Average | AFSummaryTypes.StdDev,
+                                                                          AFCalculationBasis.EventWeighted,
+                                                                          AFTimestampCalculation.MostRecentTime);
+
+            return summary;
         }
     }
 }
