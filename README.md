@@ -10,6 +10,10 @@ How to use this example.
 5. Open the included ProcessBook display and see the predictions.
 6. To stop the calcuations, enter Q in the running program.
 
+To view the values on ProcessBook, you may need to follow the following article.
+
+https://techsupport.osisoft.com/Troubleshooting/KB/KB01336
+
 ## Requirements
 The AF: PI AF 2016
 Visual Studio: Comunity 2015

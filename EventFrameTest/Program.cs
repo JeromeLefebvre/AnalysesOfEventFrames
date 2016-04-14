@@ -242,7 +242,7 @@ namespace EventFrameTest
                     else if (info.Action == AFChangeInfoAction.Updated || info.Action == AFChangeInfoAction.Removed)
                     {
                         CaptureEventFrames();
-                        CaptureEventFrames();
+                        GetAllTrends();
                         ComputeSatistics();
                     }
                 }
