@@ -24,7 +24,7 @@ using OSIsoft.AF.Time;
 using OSIsoft.AF.Asset;
 using OSIsoft.AF.Data;
 
-namespace EventFrameTest
+namespace EventFrameAnalysis
 {
     class Program
     {
@@ -38,8 +38,8 @@ namespace EventFrameTest
 
         static AFNamedCollectionList<AFEventFrame> eventFrames = null;
 
-        static string extendedPropertiesKey = EventFrameTest.Properties.Settings.Default.ExtendedPropertyKey;
-        static IEnumerable<string> extendedPropertiesValues = new string[] { EventFrameTest.Properties.Settings.Default.ExtendedPropertyValue };
+        static string extendedPropertiesKey = EventFrameAnalysis.Properties.Settings.Default.ExtendedPropertyKey;
+        static IEnumerable<string> extendedPropertiesValues = new string[] { EventFrameAnalysis.Properties.Settings.Default.ExtendedPropertyValue };
 
         static AFAttribute sensor;
         static List<AFValues> allValues;
@@ -63,9 +63,9 @@ namespace EventFrameTest
         static void Main(string[] args)
         {
             PISystems pisystems = new PISystems();
-            pisystem = pisystems[EventFrameTest.Properties.Settings.Default.AFSystemName];
-            dataDB = pisystem.Databases[EventFrameTest.Properties.Settings.Default.AFDataDB];
-            statisticDB = pisystem.Databases[EventFrameTest.Properties.Settings.Default.AFStatisticsDB];
+            pisystem = pisystems[EventFrameAnalysis.Properties.Settings.Default.AFSystemName];
+            dataDB = pisystem.Databases[EventFrameAnalysis.Properties.Settings.Default.AFDataDB];
+            statisticDB = pisystem.Databases[EventFrameAnalysis.Properties.Settings.Default.AFStatisticsDB];
 
             
             AFElement element = statisticDB.Elements["DataStatistic"];
@@ -84,7 +84,7 @@ namespace EventFrameTest
                 return;
             }
             
-            eventFrameTemplate = dataDB.ElementTemplates[EventFrameTest.Properties.Settings.Default.EFTemplate];
+            eventFrameTemplate = dataDB.ElementTemplates[EventFrameAnalysis.Properties.Settings.Default.EFTemplate];
 
             InitialRun();
 
@@ -125,7 +125,7 @@ namespace EventFrameTest
                                                                                                  searchFullHierarchy: true);
             AFEventFrame mostRecent = recentEventFrames[0];
 
-            sensor = mostRecent.Attributes[EventFrameTest.Properties.Settings.Default.EFProperty];
+            sensor = mostRecent.Attributes[EventFrameAnalysis.Properties.Settings.Default.EFProperty];
             CaptureEventFrames();
             GetAllTrends();
             ComputeSatistics();
@@ -136,11 +136,11 @@ namespace EventFrameTest
         {
             // Captures all strings with the correct extended property
             eventFrames = new AFNamedCollectionList<AFEventFrame>();
-            string setting = EventFrameTest.Properties.Settings.Default.WhichEventFramesToUse;
+            string setting = EventFrameAnalysis.Properties.Settings.Default.WhichEventFramesToUse;
 
             if (setting == "Recent" || setting == "Both")
             {
-                int count = EventFrameTest.Properties.Settings.Default.NumberOfRecentEventFrames;
+                int count = EventFrameAnalysis.Properties.Settings.Default.NumberOfRecentEventFrames;
                 AFNamedCollectionList<AFEventFrame> recentEventFrames = AFEventFrame.FindEventFrames(database: dataDB,
                                                                                                      searchRoot: null,
                                                                                                      startTime: new AFTime("*"),
@@ -189,12 +189,12 @@ namespace EventFrameTest
 
         internal static void ComputeSatistics()
         {
-            means = new List<double> { };
-            standardDeviations = new List<double> { };
+            means.Clear();
+            standardDeviations.Clear();
             foreach (AFValues row in allValues)
             {
-                means.Add(Mean(row));
-                standardDeviations.Add(StandardDeviation(row));
+                means.Add(Statistics.Mean(row));
+                standardDeviations.Add(Statistics.StandardDeviation(row));
             }
             //allValues = null;
         }
@@ -234,7 +234,7 @@ namespace EventFrameTest
                     if (info.Action == AFChangeInfoAction.Added)
                     {
                         AFEventFrame lastestEventFrame = (AFEventFrame)info.FindObject(pisystem, true); ;
-                        if (lastestEventFrame.Template.Name == EventFrameTest.Properties.Settings.Default.EFTemplate)
+                        if (lastestEventFrame.Template.Name == EventFrameAnalysis.Properties.Settings.Default.EFTemplate)
                         {
                             WriteValues(lastestEventFrame.StartTime);
                         }
@@ -247,43 +247,6 @@ namespace EventFrameTest
                     }
                 }
             }
-        }
-
-        public static double StandardDeviation(AFValues values)
-        {
-            // Returns the standard deviation of a collection of AFValues
-            // As the timestamp for each value may vary, a time stamp must also be provided to return an AFValue
-            double M = 0.0;
-            double S = 0.0;
-            int k = 1;
-            foreach (AFValue value in values)
-            {
-                double rawValue = (double) value.Value;
-                double previousM = M;
-                M += (rawValue - previousM) / k;
-                S += (rawValue - previousM) * (rawValue - M);
-                k++;
-            }
-            // S can be zero if all values are identical
-            return S == 0 ? 0 : Math.Sqrt(S / (k - 2));
-        }
-
-        public static double Mean(AFValues values)
-        {
-            // Returns the mean of a collection of AFValues
-            // As the timestamp for each value may vary, a timestamp must also be provided to return an AFValue
-            double total = 0;
-            foreach (AFValue value in values)
-            {
-                // The data stored in the attribute is of type Float32, thus possible to convert to double 
-                // Any shutdown or bad data is thrown away
-                if (value.IsGood)
-                {
-                    total += value.ValueAsDouble();
-                }
-            }
-            int count = values.Count;
-            return total / count;
         }
 
         internal static void OnElapsed(object sender, System.Timers.ElapsedEventArgs e)

@@ -1,4 +1,4 @@
-﻿namespace EventFrameTest.Properties {
+﻿namespace EventFrameAnalysis.Properties {
     
     
     // このクラスでは設定クラスでの特定のイベントを処理することができます:

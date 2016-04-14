@@ -1,0 +1,6 @@
+C:\Users\jlefebvre\Documents\GitHub\AnalysesOfEventFrames\EventFrameTest\bin\Release\EventFrameTest.exe.config
+C:\Users\jlefebvre\Documents\GitHub\AnalysesOfEventFrames\EventFrameTest\bin\Release\EventFrameTest.exe
+C:\Users\jlefebvre\Documents\GitHub\AnalysesOfEventFrames\EventFrameTest\bin\Release\EventFrameTest.pdb
+C:\Users\jlefebvre\Documents\GitHub\AnalysesOfEventFrames\EventFrameTest\obj\Release\EventFrameTest.exe
+C:\Users\jlefebvre\Documents\GitHub\AnalysesOfEventFrames\EventFrameTest\obj\Release\EventFrameTest.pdb
+C:\Users\jlefebvre\Documents\GitHub\AnalysesOfEventFrames\EventFrameTest\obj\Release\EventFrameTest.csprojResolveAssemblyReference.cache
