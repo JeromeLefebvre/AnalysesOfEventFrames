@@ -32,7 +32,6 @@ namespace EventFrameTest
         static AFDatabase dataDB = null;
         static AFDatabase statisticDB = null;
         static object cookie;
-        static PISystems pisystems = null;
         static PISystem pisystem = null;
         static ElapsedEventHandler elapsedEH = null;
         static EventHandler<AFChangedEventArgs> changedEH = null;
@@ -63,16 +62,28 @@ namespace EventFrameTest
 
         static void Main(string[] args)
         {
-            pisystems = new PISystems();
+            PISystems pisystems = new PISystems();
             pisystem = pisystems[EventFrameTest.Properties.Settings.Default.AFSystemName];
             dataDB = pisystem.Databases[EventFrameTest.Properties.Settings.Default.AFDataDB];
             statisticDB = pisystem.Databases[EventFrameTest.Properties.Settings.Default.AFStatisticsDB];
 
             
             AFElement element = statisticDB.Elements["DataStatistic"];
+            
             meanattr = element.Attributes["Mean"];
             stdattr = element.Attributes["StandardDev"];
 
+            // Force a load of the PIPoint references underlying the attributes
+            AFAttributeList attrlist = new AFAttributeList( new[] { meanattr, stdattr });
+            attrlist.GetPIPoint();
+
+            if (!meanattr.PIPoint.IsResolved || !stdattr.PIPoint.IsResolved)
+            {
+                Console.WriteLine("The tags might not have been created, please make sure that they are before continuing.");
+                Console.ReadLine();
+                return;
+            }
+            
             eventFrameTemplate = dataDB.ElementTemplates[EventFrameTest.Properties.Settings.Default.EFTemplate];
 
             InitialRun();
@@ -201,6 +212,7 @@ namespace EventFrameTest
                 projectedMean.Add(mean);
                 projectedStandardDeviation.Add(standardDeviation);
             }
+
             meanattr.Data.UpdateValues(projectedMean, AFUpdateOption.Replace);
             stdattr.Data.UpdateValues(projectedStandardDeviation, AFUpdateOption.Replace);            
         }
