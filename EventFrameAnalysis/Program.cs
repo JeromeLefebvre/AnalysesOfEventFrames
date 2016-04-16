@@ -49,8 +49,6 @@ namespace EventFrameAnalysis
         static List<IDictionary<AFSummaryTypes, AFValue>> statisticsSlices = new List<IDictionary<AFSummaryTypes, AFValue>> { };
         static IDictionary<AFSummaryTypes, AFValues> statisticsTrends = new Dictionary<AFSummaryTypes, AFValues> { };
                                                                          
-        static AFAttribute meanattr;
-        static AFAttribute stdattr;
         static Dictionary<AFSummaryTypes, AFAttribute> attributes;
 
         static AFElementTemplate eventFrameTemplate;
@@ -75,7 +73,6 @@ namespace EventFrameAnalysis
             dataDB = pisystem.Databases[EventFrameAnalysis.Properties.Settings.Default.AFDataDB];
             statisticDB = pisystem.Databases[EventFrameAnalysis.Properties.Settings.Default.AFStatisticsDB];
 
-
             AFElement element = statisticDB.Elements["DataStatistic"];
 
             attributes = new Dictionary<AFSummaryTypes, AFAttribute> {
@@ -84,21 +81,6 @@ namespace EventFrameAnalysis
                 { AFSummaryTypes.Minimum, element.Attributes["Minimum"] },
                 { AFSummaryTypes.Maximum, element.Attributes["Maximum"] }
             };
-             
-            //meanattr = element.Attributes["Mean"];
-            stdattr = element.Attributes["StandardDev"];
-            
-            /*
-            // Force a load of the PIPoint references underlying the attributes
-            AFAttributeList attrlist = new AFAttributeList(new[] { meanattr, stdattr });
-            attrlist.GetPIPoint();
-
-            if (!meanattr.PIPoint.IsResolved || !stdattr.PIPoint.IsResolved)
-            {
-                Console.WriteLine("The tags might not have been created, please make sure that they are before continuing.");
-                Console.ReadLine();
-                return;
-            }   */ 
 
             eventFrameTemplate = dataDB.ElementTemplates[EventFrameAnalysis.Properties.Settings.Default.EFTemplate];
 
@@ -145,6 +127,7 @@ namespace EventFrameAnalysis
             GetEventFrames();
             GetTrends();
             ComputeSatistics();
+            Stitch();
             WriteValues(mostRecent.StartTime);
         }
 
@@ -200,19 +183,6 @@ namespace EventFrameAnalysis
 
         internal static void ComputeSatistics()
         {
-            means.Clear();
-            standardDeviations.Clear();
-            foreach (AFValues row in slices)
-            {
-                /*
-                IDictionary<AFSummaryTypes, AFValue> meanAndStddev = tatistics(row);
-                means.Add((double)meanAndStddev[AFSummaryTypes.Average].Value);
-                standardDeviations.Add((double)meanAndStddev[AFSummaryTypes.StdDev].Value);
-                */
-            }
-        }
-        internal static void ComputeSatistics2()
-        {
             statisticsSlices.Clear();
             foreach (AFValues slice in slices)
             {
@@ -223,6 +193,11 @@ namespace EventFrameAnalysis
         internal static void Stitch()
         {
             statisticsTrends.Clear();
+            foreach (AFSummaryTypes type in types)
+            {
+                statisticsTrends[type] = new AFValues();
+            }
+
             // Takes all statistics and recreates an trend
             foreach (Dictionary<AFSummaryTypes, AFValue> statisticSlice in statisticsSlices)
             {
@@ -232,25 +207,8 @@ namespace EventFrameAnalysis
                 }
             }
         }
-        internal static void WriteValues(AFTime startTime, double interval = 1)
-        {
-            AFValues projectedMean = new AFValues();
-            AFValues projectedStandardDeviation = new AFValues();
 
-            for (int i = 0; i < means.Count; i++)
-            {
-                AFTime time = new AFTime(startTime.UtcSeconds + i* interval);
-                
-                AFValue mean = new AFValue(means[i], time);
-                AFValue standardDeviation = new AFValue(standardDeviations[i], time);
-                projectedMean.Add(mean);
-                projectedStandardDeviation.Add(standardDeviation);
-            }
-            meanattr.Data.UpdateValues(projectedMean, AFUpdateOption.Replace);
-            stdattr.Data.UpdateValues(projectedStandardDeviation, AFUpdateOption.Replace);
-        }
-
-        internal static void WriteValues2(AFTime startTime)
+        internal static void WriteValues(AFTime startTime)
         {
             foreach (AFSummaryTypes type in types)
             {
@@ -293,7 +251,7 @@ namespace EventFrameAnalysis
                         AFEventFrame lastestEventFrame = (AFEventFrame)info.FindObject(pisystem, true); ;
                         if (lastestEventFrame.Template.Name == EventFrameAnalysis.Properties.Settings.Default.EFTemplate)
                         {
-                            WriteValues2(lastestEventFrame.StartTime);
+                            WriteValues(lastestEventFrame.StartTime);
                         }
                     }
                     else if (info.Action == AFChangeInfoAction.Updated || info.Action == AFChangeInfoAction.Removed)
