@@ -42,12 +42,13 @@ namespace EventFrameAnalysis
         static IEnumerable<string> extendedPropertiesValues = new string[] { EventFrameAnalysis.Properties.Settings.Default.ExtendedPropertyValue };
 
         static AFAttribute sensor;
-        static List<AFValues> allValues;
+        static List<AFValues> slices;
 
         static List<double> means = new List<double> { };
         static List<double> standardDeviations = new List<double> { };
-        static Dictionary<AFSummaryTypes, AFValues> statisticsVal = new Dictionary<AFSummaryTypes, AFValues> { };
-
+        static List<IDictionary<AFSummaryTypes, AFValue>> statisticsSlices = new List<IDictionary<AFSummaryTypes, AFValue>> { };
+        static IDictionary<AFSummaryTypes, AFValues> statisticsTrends = new Dictionary<AFSummaryTypes, AFValues> { };
+                                                                         
         static AFAttribute meanattr;
         static AFAttribute stdattr;
         static Dictionary<AFSummaryTypes, AFAttribute> attributes;
@@ -56,7 +57,8 @@ namespace EventFrameAnalysis
 
         static AFTimeSpan interval = new AFTimeSpan(seconds: 1);
 
-        List<AFSummaryTypes> types = new List<AFSummaryTypes> { AFSummaryTypes.Maximum, AFSummaryTypes.Minimum, AFSummaryTypes.Average, AFSummaryTypes.StdDev };
+        static List<AFSummaryTypes> types = new List<AFSummaryTypes> { AFSummaryTypes.Maximum, AFSummaryTypes.Minimum, AFSummaryTypes.Average, AFSummaryTypes.StdDev };
+        static AFSummaryTypes typesCheck = AFSummaryTypes.Maximum | AFSummaryTypes.Minimum | AFSummaryTypes.Average | AFSummaryTypes.StdDev;
 
         public static void WaitForQuit()
         {
@@ -140,13 +142,13 @@ namespace EventFrameAnalysis
             AFEventFrame mostRecent = recentEventFrames[0];
 
             sensor = mostRecent.Attributes[EventFrameAnalysis.Properties.Settings.Default.EFProperty];
-            CaptureEventFrames();
-            GetAllTrends();
+            GetEventFrames();
+            GetTrends();
             ComputeSatistics();
             WriteValues(mostRecent.StartTime);
         }
 
-        internal static void CaptureEventFrames()
+        internal static void GetEventFrames()
         {
             // Captures all strings with the correct extended property
             eventFrames = new AFNamedCollectionList<AFEventFrame>();
@@ -185,43 +187,51 @@ namespace EventFrameAnalysis
             }
         }
 
-        internal static void GetAllTrends()
+        internal static void GetTrends()
         {
             // Gets all the data for the sensor attribute for the various event frames
-            List<AFValues> allTrends = new List<AFValues>();
-
+            List<AFValues> trends = new List<AFValues>();
             foreach (AFEventFrame EF in eventFrames)
             {
-                AFTimeRange range = EF.TimeRange;
-                AFValues values = sensor.Data.InterpolatedValues(EF.TimeRange
-                    , new AFTimeSpan(seconds: 1), null, "", true);
-                allTrends.Add(values);
+                trends.Add(sensor.Data.InterpolatedValues(EF.TimeRange, interval, null, "", true));
             }
-            allValues = Transpose(allTrends);
+            slices = GetSlices(trends);
         }
 
         internal static void ComputeSatistics()
         {
             means.Clear();
             standardDeviations.Clear();
-            foreach (AFValues row in allValues)
+            foreach (AFValues row in slices)
             {
-                IDictionary<AFSummaryTypes, AFValue> meanAndStddev = statistics(row);
+                /*
+                IDictionary<AFSummaryTypes, AFValue> meanAndStddev = tatistics(row);
                 means.Add((double)meanAndStddev[AFSummaryTypes.Average].Value);
                 standardDeviations.Add((double)meanAndStddev[AFSummaryTypes.StdDev].Value);
+                */
             }
         }
         internal static void ComputeSatistics2()
         {
-            statisticsVal.Clear();
-            foreach (AFValues row in allValues)
+            statisticsSlices.Clear();
+            foreach (AFValues slice in slices)
             {
-                IDictionary<AFSummaryTypes, AFValue> meanAndStddev = statistics(row);
-                means.Add((double)meanAndStddev[AFSummaryTypes.Average].Value);
-                standardDeviations.Add((double)meanAndStddev[AFSummaryTypes.StdDev].Value);
+                statisticsSlices.Add(GetStatistics(slice));
             }
         }
 
+        internal static void Stitch()
+        {
+            statisticsTrends.Clear();
+            // Takes all statistics and recreates an trend
+            foreach (Dictionary<AFSummaryTypes, AFValue> statisticSlice in statisticsSlices)
+            {
+                foreach (KeyValuePair<AFSummaryTypes, AFValue> pair in statisticSlice)
+                {
+                    statisticsTrends[pair.Key].Add(pair.Value);
+                }
+            }
+        }
         internal static void WriteValues(AFTime startTime, double interval = 1)
         {
             AFValues projectedMean = new AFValues();
@@ -244,16 +254,22 @@ namespace EventFrameAnalysis
         {
             foreach (AFSummaryTypes type in types)
             {
-                timeShift(statisticsVal[type], startTime);
-                attributes[type].Data.UpdateValues(statisticsVal[type], AFUpdateOption.Insert);
+                timeShift(statisticsTrends[type], startTime);
+                attributes[type].Data.UpdateValues(statisticsTrends[type], AFUpdateOption.Insert);
             }
+        }
+
+        public static IDictionary<AFSummaryTypes, AFValue> GetStatistics(AFValues values)
+        {
+            AFTimeRange range = new AFTimeRange(values[0].Timestamp, values[values.Count - 1].Timestamp);
+            return values.Summary(range, typesCheck, AFCalculationBasis.EventWeighted, AFTimestampCalculation.MostRecentTime);
         }
 
         internal static void timeShift(AFValues values, AFTime startTime)
         {
-            for (int i = 0; i < values.Count; i++)
+            foreach (AFValue value in values)
             {
-                values[i].Timestamp = startTime;
+                value.Timestamp = startTime;
                 startTime += interval;
             }
         }
@@ -277,13 +293,13 @@ namespace EventFrameAnalysis
                         AFEventFrame lastestEventFrame = (AFEventFrame)info.FindObject(pisystem, true); ;
                         if (lastestEventFrame.Template.Name == EventFrameAnalysis.Properties.Settings.Default.EFTemplate)
                         {
-                            WriteValues(lastestEventFrame.StartTime);
+                            WriteValues2(lastestEventFrame.StartTime);
                         }
                     }
                     else if (info.Action == AFChangeInfoAction.Updated || info.Action == AFChangeInfoAction.Removed)
                     {
-                        CaptureEventFrames();
-                        GetAllTrends();
+                        GetEventFrames();
+                        GetTrends();
                         ComputeSatistics();
                     }
                 }
@@ -301,7 +317,7 @@ namespace EventFrameAnalysis
             refreshTimer.Start();
         }
 
-        public static List<AFValues> Transpose(List<AFValues> trends)
+        public static List<AFValues> GetSlices(List<AFValues> trends)
         {
             // Does a matrix like transpose on a list of trends
             var longest = trends.Any() ? trends.Max(l => l.Count) : 0;
@@ -319,18 +335,6 @@ namespace EventFrameAnalysis
                 }
             }
             return outer;
-        }
-
-        public static IDictionary<AFSummaryTypes, AFValue> statistics(AFValues values)
-        {
-            AFTimeRange range = new AFTimeRange(values.Min(value => value.Timestamp), values.Max(value => value.Timestamp));
-            IDictionary<AFSummaryTypes, AFValue> summary = values.Summary(range,
-                                                                          AFSummaryTypes.Average | AFSummaryTypes.StdDev | AFSummaryTypes.Maximum | AFSummaryTypes.Minimum,
-                                                                          AFCalculationBasis.EventWeighted,
-                                                                          AFTimestampCalculation.MostRecentTime);
-
-            return summary;
-            
         }
     }
 }
