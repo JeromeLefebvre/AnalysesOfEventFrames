@@ -46,11 +46,17 @@ namespace EventFrameAnalysis
 
         static List<double> means = new List<double> { };
         static List<double> standardDeviations = new List<double> { };
+        static Dictionary<AFSummaryTypes, AFValues> statisticsVal = new Dictionary<AFSummaryTypes, AFValues> { };
 
         static AFAttribute meanattr;
         static AFAttribute stdattr;
+        static Dictionary<AFSummaryTypes, AFAttribute> attributes;
 
         static AFElementTemplate eventFrameTemplate;
+
+        static AFTimeSpan interval = new AFTimeSpan(seconds: 1);
+
+        List<AFSummaryTypes> types = new List<AFSummaryTypes> { AFSummaryTypes.Maximum, AFSummaryTypes.Minimum, AFSummaryTypes.Average, AFSummaryTypes.StdDev };
 
         public static void WaitForQuit()
         {
@@ -70,9 +76,17 @@ namespace EventFrameAnalysis
 
             AFElement element = statisticDB.Elements["DataStatistic"];
 
-            meanattr = element.Attributes["Mean"];
+            attributes = new Dictionary<AFSummaryTypes, AFAttribute> {
+                { AFSummaryTypes.Average, element.Attributes["Mean"] },
+                { AFSummaryTypes.StdDev, element.Attributes["StandardDev"] },
+                { AFSummaryTypes.Minimum, element.Attributes["Minimum"] },
+                { AFSummaryTypes.Maximum, element.Attributes["Maximum"] }
+            };
+             
+            //meanattr = element.Attributes["Mean"];
             stdattr = element.Attributes["StandardDev"];
-
+            
+            /*
             // Force a load of the PIPoint references underlying the attributes
             AFAttributeList attrlist = new AFAttributeList(new[] { meanattr, stdattr });
             attrlist.GetPIPoint();
@@ -82,7 +96,7 @@ namespace EventFrameAnalysis
                 Console.WriteLine("The tags might not have been created, please make sure that they are before continuing.");
                 Console.ReadLine();
                 return;
-            }
+            }   */ 
 
             eventFrameTemplate = dataDB.ElementTemplates[EventFrameAnalysis.Properties.Settings.Default.EFTemplate];
 
@@ -179,9 +193,8 @@ namespace EventFrameAnalysis
             foreach (AFEventFrame EF in eventFrames)
             {
                 AFTimeRange range = EF.TimeRange;
-                // need to change the following...
-                //AFValues values = sensor.Data.InterpolatedValues(range, new AFTimeSpan(seconds: 1), null, "not BadVal('sinusoid')", false);
-                AFValues values = sensor.Data.InterpolatedValues(range, new AFTimeSpan(seconds: 1), null, "", true);
+                AFValues values = sensor.Data.InterpolatedValues(EF.TimeRange
+                    , new AFTimeSpan(seconds: 1), null, "", true);
                 allTrends.Add(values);
             }
             allValues = Transpose(allTrends);
@@ -198,23 +211,51 @@ namespace EventFrameAnalysis
                 standardDeviations.Add((double)meanAndStddev[AFSummaryTypes.StdDev].Value);
             }
         }
+        internal static void ComputeSatistics2()
+        {
+            statisticsVal.Clear();
+            foreach (AFValues row in allValues)
+            {
+                IDictionary<AFSummaryTypes, AFValue> meanAndStddev = statistics(row);
+                means.Add((double)meanAndStddev[AFSummaryTypes.Average].Value);
+                standardDeviations.Add((double)meanAndStddev[AFSummaryTypes.StdDev].Value);
+            }
+        }
 
-        internal static void WriteValues(AFTime startTime)
+        internal static void WriteValues(AFTime startTime, double interval = 1)
         {
             AFValues projectedMean = new AFValues();
             AFValues projectedStandardDeviation = new AFValues();
 
             for (int i = 0; i < means.Count; i++)
             {
-                AFTime time = new AFTime(startTime.UtcSeconds + i);
+                AFTime time = new AFTime(startTime.UtcSeconds + i* interval);
+                
                 AFValue mean = new AFValue(means[i], time);
                 AFValue standardDeviation = new AFValue(standardDeviations[i], time);
                 projectedMean.Add(mean);
                 projectedStandardDeviation.Add(standardDeviation);
             }
-
             meanattr.Data.UpdateValues(projectedMean, AFUpdateOption.Replace);
             stdattr.Data.UpdateValues(projectedStandardDeviation, AFUpdateOption.Replace);
+        }
+
+        internal static void WriteValues2(AFTime startTime)
+        {
+            foreach (AFSummaryTypes type in types)
+            {
+                timeShift(statisticsVal[type], startTime);
+                attributes[type].Data.UpdateValues(statisticsVal[type], AFUpdateOption.Insert);
+            }
+        }
+
+        internal static void timeShift(AFValues values, AFTime startTime)
+        {
+            for (int i = 0; i < values.Count; i++)
+            {
+                values[i].Timestamp = startTime;
+                startTime += interval;
+            }
         }
 
         internal static void OnChanged(object sender, AFChangedEventArgs e)
@@ -284,11 +325,12 @@ namespace EventFrameAnalysis
         {
             AFTimeRange range = new AFTimeRange(values.Min(value => value.Timestamp), values.Max(value => value.Timestamp));
             IDictionary<AFSummaryTypes, AFValue> summary = values.Summary(range,
-                                                                          AFSummaryTypes.Average | AFSummaryTypes.StdDev,
+                                                                          AFSummaryTypes.Average | AFSummaryTypes.StdDev | AFSummaryTypes.Maximum | AFSummaryTypes.Minimum,
                                                                           AFCalculationBasis.EventWeighted,
                                                                           AFTimestampCalculation.MostRecentTime);
 
             return summary;
+            
         }
     }
 }
