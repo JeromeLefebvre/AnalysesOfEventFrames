@@ -1,6 +1,0 @@
-C:\Users\jlefebvre\Documents\GitHub\AnalysesOfEventFrames\EventFrameAnalysis\obj\Debug\EventFrameAnalysis.csprojResolveAssemblyReference.cache
-C:\Users\jlefebvre\Documents\GitHub\AnalysesOfEventFrames\EventFrameAnalysis\bin\Debug\EventFrameAnalysis.exe.config
-C:\Users\jlefebvre\Documents\GitHub\AnalysesOfEventFrames\EventFrameAnalysis\bin\Debug\EventFrameAnalysis.exe
-C:\Users\jlefebvre\Documents\GitHub\AnalysesOfEventFrames\EventFrameAnalysis\bin\Debug\EventFrameAnalysis.pdb
-C:\Users\jlefebvre\Documents\GitHub\AnalysesOfEventFrames\EventFrameAnalysis\obj\Debug\EventFrameAnalysis.exe
-C:\Users\jlefebvre\Documents\GitHub\AnalysesOfEventFrames\EventFrameAnalysis\obj\Debug\EventFrameAnalysis.pdb

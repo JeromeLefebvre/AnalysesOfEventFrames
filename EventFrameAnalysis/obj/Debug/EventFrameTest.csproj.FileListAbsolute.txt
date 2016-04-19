@@ -1,9 +1,0 @@
-C:\Users\jlefebvre\Documents\GitHub\AnalysesOfEventFrames\EventFrameTest\bin\Debug\EventFrameTest.exe.config
-C:\Users\jlefebvre\Documents\GitHub\AnalysesOfEventFrames\EventFrameTest\bin\Debug\EventFrameTest.exe
-C:\Users\jlefebvre\Documents\GitHub\AnalysesOfEventFrames\EventFrameTest\bin\Debug\EventFrameTest.pdb
-C:\Users\jlefebvre\Documents\GitHub\AnalysesOfEventFrames\EventFrameTest\obj\Debug\EventFrameTest.csprojResolveAssemblyReference.cache
-C:\Users\jlefebvre\Documents\GitHub\AnalysesOfEventFrames\EventFrameTest\obj\Debug\EventFrameTest.exe
-C:\Users\jlefebvre\Documents\GitHub\AnalysesOfEventFrames\EventFrameTest\obj\Debug\EventFrameTest.pdb
-C:\Users\jlefebvre\Documents\GitHub\AnalysesOfEventFrames\EventFrameAnalysis\bin\Debug\EventFrameTest.exe.config
-C:\Users\jlefebvre\Documents\GitHub\AnalysesOfEventFrames\EventFrameAnalysis\obj\Debug\EventFrameTest.exe
-C:\Users\jlefebvre\Documents\GitHub\AnalysesOfEventFrames\EventFrameAnalysis\obj\Debug\EventFrameTest.pdb
