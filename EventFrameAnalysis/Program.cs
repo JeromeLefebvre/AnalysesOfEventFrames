@@ -23,6 +23,7 @@ using OSIsoft.AF.EventFrame;
 using OSIsoft.AF.Time;
 using OSIsoft.AF.Asset;
 using OSIsoft.AF.Data;
+using OSIsoft.AF.PI;
 
 namespace EventFrameAnalysis
 {
@@ -210,11 +211,20 @@ namespace EventFrameAnalysis
 
         internal static void WriteValues(AFTime startTime)
         {
+            PIServers servers = new PIServers();
+            PIServer server = servers["localhost"];
+            AFEnumerationValue nodata = server.StateSets["SYSTEM"]["NO Data"];
+
+            AFValue nodataValue = new AFValue(nodata);
+
             foreach (AFSummaryTypes type in types)
             {
-                timeShift(statisticsTrends[type], startTime);
+                AFTime lastTime = timeShift(statisticsTrends[type], startTime);
                 attributes[type].Data.UpdateValues(statisticsTrends[type], AFUpdateOption.Insert);
+                // Write no data at the end of each trend
+                attributes[type].Data.UpdateValue(nodataValue, AFUpdateOption.Insert);
             }
+
         }
 
         public static IDictionary<AFSummaryTypes, AFValue> GetStatistics(AFValues values)
@@ -223,13 +233,14 @@ namespace EventFrameAnalysis
             return values.Summary(range, typesCheck, AFCalculationBasis.EventWeighted, AFTimestampCalculation.MostRecentTime);
         }
 
-        internal static void timeShift(AFValues values, AFTime startTime)
+        internal static AFTime timeShift(AFValues values, AFTime startTime)
         {
             foreach (AFValue value in values)
             {
                 value.Timestamp = startTime;
                 startTime += interval;
             }
+            return startTime;
         }
 
         internal static void OnChanged(object sender, AFChangedEventArgs e)
@@ -259,6 +270,7 @@ namespace EventFrameAnalysis
                         GetEventFrames();
                         GetTrends();
                         ComputeSatistics();
+                        Stitch();
                     }
                 }
             }
@@ -277,9 +289,7 @@ namespace EventFrameAnalysis
 
         public static List<AFValues> GetSlices(List<AFValues> trends)
         {
-            // Does a matrix like transpose on a list of trends
-            var longest = trends.Any() ? trends.Max(l => l.Count) : 0;
-
+            int longest = trends.Any() ? trends.Max(l => l.Count) : 0;
             List<AFValues> outer = new List<AFValues>();
             for (int i = 0; i < longest; i++)
             {
