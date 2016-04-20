@@ -29,35 +29,31 @@ namespace EventFrameAnalysis
 {
     class Program
     {
-        static Timer refreshTimer = new Timer(1000);
+        static PISystem pisystem = null;
         static AFDatabase dataDB = null;
         static AFDatabase statisticDB = null;
+
+        static Timer refreshTimer = new Timer(1000);
         static object cookie;
-        static PISystem pisystem = null;
         static ElapsedEventHandler elapsedEH = null;
         static EventHandler<AFChangedEventArgs> changedEH = null;
 
+        static AFElementTemplate eventFrameTemplate;
         static AFNamedCollectionList<AFEventFrame> eventFrames = null;
-
         static string extendedPropertiesKey = EventFrameAnalysis.Properties.Settings.Default.ExtendedPropertyKey;
         static IEnumerable<string> extendedPropertiesValues = new string[] { EventFrameAnalysis.Properties.Settings.Default.ExtendedPropertyValue };
 
         static AFAttribute sensor;
         static List<AFValues> slices;
-
-        static List<double> means = new List<double> { };
-        static List<double> standardDeviations = new List<double> { };
         static List<IDictionary<AFSummaryTypes, AFValue>> statisticsSlices = new List<IDictionary<AFSummaryTypes, AFValue>> { };
-        static IDictionary<AFSummaryTypes, AFValues> statisticsTrends = new Dictionary<AFSummaryTypes, AFValues> { };
-                                                                         
+        static IDictionary<AFSummaryTypes, AFValues> statisticsTrends = new Dictionary<AFSummaryTypes, AFValues> { };                      
         static Dictionary<AFSummaryTypes, AFAttribute> attributes;
-
-        static AFElementTemplate eventFrameTemplate;
 
         static AFTimeSpan interval = new AFTimeSpan(seconds: 1);
 
         static List<AFSummaryTypes> types = new List<AFSummaryTypes> { AFSummaryTypes.Maximum, AFSummaryTypes.Minimum, AFSummaryTypes.Average, AFSummaryTypes.StdDev };
         static AFSummaryTypes typesCheck = AFSummaryTypes.Maximum | AFSummaryTypes.Minimum | AFSummaryTypes.Average | AFSummaryTypes.StdDev;
+
 
         public static void WaitForQuit()
         {
@@ -84,6 +80,8 @@ namespace EventFrameAnalysis
             };
 
             eventFrameTemplate = dataDB.ElementTemplates[EventFrameAnalysis.Properties.Settings.Default.EFTemplate];
+
+            sensor = element.Attributes["Sensor"];
 
             InitialRun();
 
@@ -122,14 +120,16 @@ namespace EventFrameAnalysis
                                                                                                  elemCategory: null,
                                                                                                  elemTemplate: eventFrameTemplate,
                                                                                                  searchFullHierarchy: true);
-            AFEventFrame mostRecent = recentEventFrames[0];
+            
+            if (recentEventFrames.Count > 0) {
+                AFEventFrame mostRecent = recentEventFrames[0];
 
-            sensor = mostRecent.Attributes[EventFrameAnalysis.Properties.Settings.Default.EFProperty];
-            GetEventFrames();
-            GetTrends();
-            ComputeSatistics();
-            Stitch();
-            WriteValues(mostRecent.StartTime);
+                GetEventFrames();
+                GetTrends();
+                ComputeSatistics();
+                Stitch();
+                WriteValues(mostRecent.StartTime);
+            }
         }
 
         internal static void GetEventFrames()
@@ -215,16 +215,17 @@ namespace EventFrameAnalysis
             PIServer server = servers["localhost"];
             AFEnumerationValue nodata = server.StateSets["SYSTEM"]["NO Data"];
 
-            AFValue nodataValue = new AFValue(nodata);
+           
 
             foreach (AFSummaryTypes type in types)
             {
                 AFTime lastTime = timeShift(statisticsTrends[type], startTime);
                 attributes[type].Data.UpdateValues(statisticsTrends[type], AFUpdateOption.Insert);
                 // Write no data at the end of each trend
-                attributes[type].Data.UpdateValue(nodataValue, AFUpdateOption.Insert);
+                AFValue nodataValue = new AFValue(nodata, lastTime);
+            
+                attributes[type].PIPoint.UpdateValue(nodataValue, AFUpdateOption.Insert);
             }
-
         }
 
         public static IDictionary<AFSummaryTypes, AFValue> GetStatistics(AFValues values)

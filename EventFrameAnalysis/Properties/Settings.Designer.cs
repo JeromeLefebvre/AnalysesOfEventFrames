@@ -88,7 +88,6 @@ namespace EventFrameAnalysis.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("10")]
         public int NumberOfRecentEventFrames {
             get {
                 return ((int)(this["NumberOfRecentEventFrames"]));

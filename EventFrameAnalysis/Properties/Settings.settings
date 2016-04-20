@@ -21,7 +21,6 @@
       <Value Profile="(Default)">Recent</Value>
     </Setting>
     <Setting Name="NumberOfRecentEventFrames" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">10</Value>
     </Setting>
     <Setting Name="AFDataDB" Type="System.String" Scope="User">
       <Value Profile="(Default)">GenerationOfData</Value>
