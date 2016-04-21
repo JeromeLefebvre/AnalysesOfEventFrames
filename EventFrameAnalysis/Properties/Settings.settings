@@ -21,7 +21,7 @@
       <Value Profile="(Default)">Recent</Value>
     </Setting>
     <Setting Name="NumberOfRecentEventFrames" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">100</Value>
+      <Value Profile="(Default)">10</Value>
     </Setting>
     <Setting Name="AFDataDB" Type="System.String" Scope="User">
       <Value Profile="(Default)">GenerationOfData</Value>
@@ -29,8 +29,8 @@
     <Setting Name="EFProperty" Type="System.String" Scope="User">
       <Value Profile="(Default)">sensor</Value>
     </Setting>
-    <Setting Name="NameFilter" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Odd*</Value>
+    <Setting Name="EventFrameName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Even</Value>
     </Setting>
   </Settings>
 </SettingsFile>

@@ -120,7 +120,7 @@ namespace EventFrameAnalysis
                                                                                                  startIndex: 0,
                                                                                                  maxCount: 1,
                                                                                                  searchMode: AFEventFrameSearchMode.BackwardInProgress,
-                                                                                                 nameFilter: EventFrameAnalysis.Properties.Settings.Default.NameFilter,
+                                                                                                 nameFilter: EventFrameAnalysis.Properties.Settings.Default.EventFrameName,
                                                                                                  referencedElementNameFilter: "",
                                                                                                  elemCategory: null,
                                                                                                  elemTemplate: eventFrameTemplate,
@@ -152,7 +152,7 @@ namespace EventFrameAnalysis
                                                                                                      startIndex: 0,
                                                                                                      maxCount: count,
                                                                                                      searchMode: AFEventFrameSearchMode.BackwardFromEndTime,
-                                                                                                     nameFilter: EventFrameAnalysis.Properties.Settings.Default.NameFilter,
+                                                                                                     nameFilter: EventFrameAnalysis.Properties.Settings.Default.EventFrameName + "*",
                                                                                                      referencedElementNameFilter: "",
                                                                                                      elemCategory: null,
                                                                                                      elemTemplate: eventFrameTemplate,
@@ -259,8 +259,9 @@ namespace EventFrameAnalysis
                 {
                     if (info.Action == AFChangeInfoAction.Added)
                     {
-                        AFEventFrame lastestEventFrame = (AFEventFrame)info.FindObject(pisystem, true); ;
-                        if (lastestEventFrame.Template.Name == EventFrameAnalysis.Properties.Settings.Default.EFTemplate)
+                        AFEventFrame lastestEventFrame = (AFEventFrame)info.FindObject(pisystem, true);
+                         
+                        if (lastestEventFrame.Template.Name == EventFrameAnalysis.Properties.Settings.Default.EFTemplate && lastestEventFrame.Name.StartsWith(EventFrameAnalysis.Properties.Settings.Default.EventFrameName))
                         {
                             WriteValues(lastestEventFrame.StartTime);
                         }

@@ -52,7 +52,7 @@ namespace EventFrameAnalysis.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("use")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Product")]
         public string ExtendedPropertyKey {
             get {
                 return ((string)(this["ExtendedPropertyKey"]));
@@ -64,7 +64,7 @@ namespace EventFrameAnalysis.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("99")]
+        [global::System.Configuration.DefaultSettingValueAttribute("A")]
         public string ExtendedPropertyValue {
             get {
                 return ((string)(this["ExtendedPropertyValue"]));
@@ -88,7 +88,7 @@ namespace EventFrameAnalysis.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        [global::System.Configuration.DefaultSettingValueAttribute("10")]
         public int NumberOfRecentEventFrames {
             get {
                 return ((int)(this["NumberOfRecentEventFrames"]));
@@ -124,13 +124,13 @@ namespace EventFrameAnalysis.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Odd*")]
-        public string NameFilter {
+        [global::System.Configuration.DefaultSettingValueAttribute("Even")]
+        public string EventFrameName {
             get {
-                return ((string)(this["NameFilter"]));
+                return ((string)(this["EventFrameName"]));
             }
             set {
-                this["NameFilter"] = value;
+                this["EventFrameName"] = value;
             }
         }
     }
