@@ -51,9 +51,10 @@ namespace EventFrameAnalysis
 
         static AFTimeSpan interval = new AFTimeSpan(seconds: 1);
 
-        static List<AFSummaryTypes> types = new List<AFSummaryTypes> { AFSummaryTypes.Maximum, AFSummaryTypes.Minimum, AFSummaryTypes.Average, AFSummaryTypes.StdDev };
-        static AFSummaryTypes typesCheck = AFSummaryTypes.Maximum | AFSummaryTypes.Minimum | AFSummaryTypes.Average | AFSummaryTypes.StdDev;
+        static List<AFSummaryTypes> types = new List<AFSummaryTypes> { AFSummaryTypes.Average, AFSummaryTypes.StdDev }; // AFSummaryTypes.Maximum, AFSummaryTypes.Minimum
+        static AFSummaryTypes typesCheck = AFSummaryTypes.Average | AFSummaryTypes.StdDev; // AFSummaryTypes.Maximum | AFSummaryTypes.Minimum | 
 
+        static AFEnumerationValue nodata;
 
         public static void WaitForQuit()
         {
@@ -70,13 +71,17 @@ namespace EventFrameAnalysis
             dataDB = pisystem.Databases[EventFrameAnalysis.Properties.Settings.Default.AFDataDB];
             statisticDB = pisystem.Databases[EventFrameAnalysis.Properties.Settings.Default.AFStatisticsDB];
 
+            PIServers servers = new PIServers();
+            PIServer server = servers["localhost"];
+            nodata = server.StateSets["SYSTEM"]["NO Data"];
+
             AFElement element = statisticDB.Elements["DataStatistic"];
 
             attributes = new Dictionary<AFSummaryTypes, AFAttribute> {
+                //{ AFSummaryTypes.Minimum, element.Attributes["Minimum"] },
+                //{ AFSummaryTypes.Maximum, element.Attributes["Maximum"] },
                 { AFSummaryTypes.Average, element.Attributes["Mean"] },
-                { AFSummaryTypes.StdDev, element.Attributes["StandardDev"] },
-                { AFSummaryTypes.Minimum, element.Attributes["Minimum"] },
-                { AFSummaryTypes.Maximum, element.Attributes["Maximum"] }
+                { AFSummaryTypes.StdDev, element.Attributes["StandardDev"] }
             };
 
             eventFrameTemplate = dataDB.ElementTemplates[EventFrameAnalysis.Properties.Settings.Default.EFTemplate];
@@ -115,19 +120,19 @@ namespace EventFrameAnalysis
                                                                                                  startIndex: 0,
                                                                                                  maxCount: 1,
                                                                                                  searchMode: AFEventFrameSearchMode.BackwardInProgress,
-                                                                                                 nameFilter: "",
+                                                                                                 nameFilter: EventFrameAnalysis.Properties.Settings.Default.NameFilter,
                                                                                                  referencedElementNameFilter: "",
                                                                                                  elemCategory: null,
                                                                                                  elemTemplate: eventFrameTemplate,
                                                                                                  searchFullHierarchy: true);
-            
+
+            GetEventFrames();
+            GetTrends();
+            ComputeSatistics();
+            Stitch();
+
             if (recentEventFrames.Count > 0) {
                 AFEventFrame mostRecent = recentEventFrames[0];
-
-                GetEventFrames();
-                GetTrends();
-                ComputeSatistics();
-                Stitch();
                 WriteValues(mostRecent.StartTime);
             }
         }
@@ -147,7 +152,7 @@ namespace EventFrameAnalysis
                                                                                                      startIndex: 0,
                                                                                                      maxCount: count,
                                                                                                      searchMode: AFEventFrameSearchMode.BackwardFromEndTime,
-                                                                                                     nameFilter: "",
+                                                                                                     nameFilter: EventFrameAnalysis.Properties.Settings.Default.NameFilter,
                                                                                                      referencedElementNameFilter: "",
                                                                                                      elemCategory: null,
                                                                                                      elemTemplate: eventFrameTemplate,
@@ -211,12 +216,6 @@ namespace EventFrameAnalysis
 
         internal static void WriteValues(AFTime startTime)
         {
-            PIServers servers = new PIServers();
-            PIServer server = servers["localhost"];
-            AFEnumerationValue nodata = server.StateSets["SYSTEM"]["NO Data"];
-
-           
-
             foreach (AFSummaryTypes type in types)
             {
                 AFTime lastTime = timeShift(statisticsTrends[type], startTime);

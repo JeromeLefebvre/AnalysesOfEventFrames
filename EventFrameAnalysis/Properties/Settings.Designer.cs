@@ -88,6 +88,7 @@ namespace EventFrameAnalysis.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
         public int NumberOfRecentEventFrames {
             get {
                 return ((int)(this["NumberOfRecentEventFrames"]));
@@ -118,6 +119,18 @@ namespace EventFrameAnalysis.Properties {
             }
             set {
                 this["EFProperty"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Odd*")]
+        public string NameFilter {
+            get {
+                return ((string)(this["NameFilter"]));
+            }
+            set {
+                this["NameFilter"] = value;
             }
         }
     }
