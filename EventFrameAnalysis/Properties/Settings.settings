@@ -11,26 +11,32 @@
     <Setting Name="EFTemplate" Type="System.String" Scope="Application">
       <Value Profile="(Default)">Batch</Value>
     </Setting>
-    <Setting Name="ExtendedPropertyKey" Type="System.String" Scope="User">
-      <Value Profile="(Default)">use</Value>
+    <Setting Name="ExtendedPropertyKey" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">GoldenLot</Value>
     </Setting>
-    <Setting Name="ExtendedPropertyValue" Type="System.String" Scope="User">
-      <Value Profile="(Default)">99</Value>
+    <Setting Name="ExtendedPropertyValue" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">F</Value>
     </Setting>
-    <Setting Name="WhichEventFramesToUse" Type="System.String" Scope="User">
+    <Setting Name="WhichEventFramesToUse" Type="System.String" Scope="Application">
       <Value Profile="(Default)">Recent</Value>
     </Setting>
-    <Setting Name="NumberOfRecentEventFrames" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">10</Value>
+    <Setting Name="NumberOfRecentEventFrames" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">100</Value>
     </Setting>
-    <Setting Name="AFDataDB" Type="System.String" Scope="User">
+    <Setting Name="AFDataDB" Type="System.String" Scope="Application">
       <Value Profile="(Default)">GenerationOfData</Value>
     </Setting>
-    <Setting Name="EFProperty" Type="System.String" Scope="User">
-      <Value Profile="(Default)">sensor</Value>
-    </Setting>
-    <Setting Name="EventFrameName" Type="System.String" Scope="User">
+    <Setting Name="EventFrameName" Type="System.String" Scope="Application">
       <Value Profile="(Default)">Even</Value>
+    </Setting>
+    <Setting Name="PIDataArchive" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">localhost</Value>
+    </Setting>
+    <Setting Name="SensorName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">\\localhost\DB\Sensor</Value>
+    </Setting>
+    <Setting Name="SensorUpperBound" Type="System.String" Scope="User">
+      <Value Profile="(Default)">\\localhost\DB\Sensor3Sigma</Value>
     </Setting>
   </Settings>
 </SettingsFile>

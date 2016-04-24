@@ -50,87 +50,90 @@ namespace EventFrameAnalysis.Properties {
             }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Product")]
+        [global::System.Configuration.DefaultSettingValueAttribute("GoldenLot")]
         public string ExtendedPropertyKey {
             get {
                 return ((string)(this["ExtendedPropertyKey"]));
             }
-            set {
-                this["ExtendedPropertyKey"] = value;
-            }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("A")]
+        [global::System.Configuration.DefaultSettingValueAttribute("F")]
         public string ExtendedPropertyValue {
             get {
                 return ((string)(this["ExtendedPropertyValue"]));
             }
-            set {
-                this["ExtendedPropertyValue"] = value;
-            }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("Recent")]
         public string WhichEventFramesToUse {
             get {
                 return ((string)(this["WhichEventFramesToUse"]));
             }
-            set {
-                this["WhichEventFramesToUse"] = value;
-            }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("10")]
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
         public int NumberOfRecentEventFrames {
             get {
                 return ((int)(this["NumberOfRecentEventFrames"]));
             }
-            set {
-                this["NumberOfRecentEventFrames"] = value;
-            }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("GenerationOfData")]
         public string AFDataDB {
             get {
                 return ((string)(this["AFDataDB"]));
             }
-            set {
-                this["AFDataDB"] = value;
-            }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("sensor")]
-        public string EFProperty {
-            get {
-                return ((string)(this["EFProperty"]));
-            }
-            set {
-                this["EFProperty"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("Even")]
         public string EventFrameName {
             get {
                 return ((string)(this["EventFrameName"]));
             }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("localhost")]
+        public string PIDataArchive {
+            get {
+                return ((string)(this["PIDataArchive"]));
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("\\\\localhost\\DB\\Sensor")]
+        public string SensorName {
+            get {
+                return ((string)(this["SensorName"]));
+            }
             set {
-                this["EventFrameName"] = value;
+                this["SensorName"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("\\\\localhost\\DB\\Sensor3Sigma")]
+        public string SensorUpperBound {
+            get {
+                return ((string)(this["SensorUpperBound"]));
+            }
+            set {
+                this["SensorUpperBound"] = value;
             }
         }
     }

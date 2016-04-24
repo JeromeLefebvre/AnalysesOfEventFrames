@@ -51,8 +51,11 @@ namespace EventFrameAnalysis
 
         static AFTimeSpan interval = new AFTimeSpan(seconds: 1);
 
-        static List<AFSummaryTypes> types = new List<AFSummaryTypes> { AFSummaryTypes.Average, AFSummaryTypes.StdDev }; // AFSummaryTypes.Maximum, AFSummaryTypes.Minimum
-        static AFSummaryTypes typesCheck = AFSummaryTypes.Average | AFSummaryTypes.StdDev; // AFSummaryTypes.Maximum | AFSummaryTypes.Minimum | 
+        static List<AFSummaryTypes> types = new List<AFSummaryTypes> { AFSummaryTypes.Average, AFSummaryTypes.StdDev, AFSummaryTypes.Maximum, AFSummaryTypes.Minimum };
+        static AFSummaryTypes typesCheck = AFSummaryTypes.Average | AFSummaryTypes.StdDev | AFSummaryTypes.Maximum | AFSummaryTypes.Minimum;
+
+        static List<AFValues> bounds = new List<AFValues> { };
+        static List<AFAttribute> boundAttributes;
 
         static AFEnumerationValue nodata;
 
@@ -72,17 +75,26 @@ namespace EventFrameAnalysis
             statisticDB = pisystem.Databases[EventFrameAnalysis.Properties.Settings.Default.AFStatisticsDB];
 
             PIServers servers = new PIServers();
-            PIServer server = servers["localhost"];
+            PIServer server = servers[EventFrameAnalysis.Properties.Settings.Default.PIDataArchive];
             nodata = server.StateSets["SYSTEM"]["NO Data"];
 
             AFElement element = statisticDB.Elements["DataStatistic"];
 
+            
             attributes = new Dictionary<AFSummaryTypes, AFAttribute> {
-                //{ AFSummaryTypes.Minimum, element.Attributes["Minimum"] },
-                //{ AFSummaryTypes.Maximum, element.Attributes["Maximum"] },
+                { AFSummaryTypes.Minimum, element.Attributes["Minimum"] },
+                { AFSummaryTypes.Maximum, element.Attributes["Maximum"] },
                 { AFSummaryTypes.Average, element.Attributes["Mean"] },
                 { AFSummaryTypes.StdDev, element.Attributes["StandardDev"] }
             };
+
+            boundAttributes = new List<AFAttribute>
+            {
+                element.Attributes["+3 sigma"],
+                element.Attributes["-3 sigma"]
+            };
+            bounds.Add(new AFValues());
+            bounds.Add(new AFValues());
 
             eventFrameTemplate = dataDB.ElementTemplates[EventFrameAnalysis.Properties.Settings.Default.EFTemplate];
 
@@ -130,6 +142,7 @@ namespace EventFrameAnalysis
             GetTrends();
             ComputeSatistics();
             Stitch();
+            ComputeBounds();
 
             if (recentEventFrames.Count > 0) {
                 AFEventFrame mostRecent = recentEventFrames[0];
@@ -161,7 +174,7 @@ namespace EventFrameAnalysis
                 eventFrames.AddRange(recentEventFrames);
             }
 
-            if (setting == "ExtendedProperties" || setting == "Both")
+            if (setting == "Golden" || setting == "Both")
             {
                 IList<KeyValuePair<string, AFEventFrame>> searchedEventFrames = AFEventFrame.FindEventFramesByExtendedProperty(database: dataDB,
                                                                                                                                propertyName: extendedPropertiesKey,
@@ -196,6 +209,22 @@ namespace EventFrameAnalysis
             }
         }
 
+        internal static void ComputeBounds()
+        {
+            bounds[0].Clear();
+            bounds[1].Clear();
+            int index = 0;
+             foreach(AFValue mean in statisticsTrends[AFSummaryTypes.Average])
+            {
+                AFValue stddev = statisticsTrends[AFSummaryTypes.StdDev][index];
+                AFValue upper = new AFValue(mean.ValueAsDouble() + 3 * stddev.ValueAsDouble(), mean.Timestamp);
+                AFValue lower = new AFValue(mean.ValueAsDouble() - 3 * stddev.ValueAsDouble(), mean.Timestamp);
+                bounds[0].Add(upper);
+                bounds[1].Add(lower);
+                index++;
+            }
+        }
+
         internal static void Stitch()
         {
             statisticsTrends.Clear();
@@ -216,14 +245,22 @@ namespace EventFrameAnalysis
 
         internal static void WriteValues(AFTime startTime)
         {
+            AFTime lastTime;
+            AFValue nodataValue;
             foreach (AFSummaryTypes type in types)
             {
-                AFTime lastTime = timeShift(statisticsTrends[type], startTime);
+                lastTime = timeShift(statisticsTrends[type], startTime);
                 attributes[type].Data.UpdateValues(statisticsTrends[type], AFUpdateOption.Insert);
                 // Write no data at the end of each trend
-                AFValue nodataValue = new AFValue(nodata, lastTime);
+                nodataValue = new AFValue(nodata, lastTime);
             
                 attributes[type].PIPoint.UpdateValue(nodataValue, AFUpdateOption.Insert);
+            }
+            for (int i = 0; i < 2; i++) { 
+                lastTime = timeShift(bounds[i], startTime);
+                boundAttributes[i].Data.UpdateValues(bounds[i], AFUpdateOption.Insert);
+                nodataValue = new AFValue(nodata, lastTime);
+                boundAttributes[i].PIPoint.UpdateValue(nodataValue, AFUpdateOption.Insert);
             }
         }
 
@@ -272,6 +309,7 @@ namespace EventFrameAnalysis
                         GetTrends();
                         ComputeSatistics();
                         Stitch();
+                        ComputeBounds();
                     }
                 }
             }
