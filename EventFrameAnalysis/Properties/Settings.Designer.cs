@@ -25,115 +25,94 @@ namespace EventFrameAnalysis.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("localhost")]
-        public string AFSystemName {
+        [global::System.Configuration.DefaultSettingValueAttribute("\\data|sensor")]
+        public string SensorPath {
             get {
-                return ((string)(this["AFSystemName"]));
+                return ((string)(this["SensorPath"]));
             }
         }
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("DataStatistics")]
-        public string AFStatisticsDB {
+        [global::System.Configuration.DefaultSettingValueAttribute("\\data|upper")]
+        public string UpperBoundPath {
             get {
-                return ((string)(this["AFStatisticsDB"]));
+                return ((string)(this["UpperBoundPath"]));
             }
         }
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Batch")]
-        public string EFTemplate {
+        [global::System.Configuration.DefaultSettingValueAttribute("\\data|lower")]
+        public string LowerBoundPath {
             get {
-                return ((string)(this["EFTemplate"]));
+                return ((string)(this["LowerBoundPath"]));
             }
         }
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("GoldenLot")]
-        public string ExtendedPropertyKey {
+        [global::System.Configuration.DefaultSettingValueAttribute("300")]
+        public string RecalculationInterval {
             get {
-                return ((string)(this["ExtendedPropertyKey"]));
+                return ((string)(this["RecalculationInterval"]));
             }
         }
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("F")]
-        public string ExtendedPropertyValue {
+        [global::System.Configuration.DefaultSettingValueAttribute("Name:=*dflaj*template:= start > *-5d")]
+        public string EventFrameQuery {
             get {
-                return ((string)(this["ExtendedPropertyValue"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Recent")]
-        public string WhichEventFramesToUse {
-            get {
-                return ((string)(this["WhichEventFramesToUse"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("100")]
-        public int NumberOfRecentEventFrames {
-            get {
-                return ((int)(this["NumberOfRecentEventFrames"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("GenerationOfData")]
-        public string AFDataDB {
-            get {
-                return ((string)(this["AFDataDB"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Even")]
-        public string EventFrameName {
-            get {
-                return ((string)(this["EventFrameName"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("localhost")]
-        public string PIDataArchive {
-            get {
-                return ((string)(this["PIDataArchive"]));
+                return ((string)(this["EventFrameQuery"]));
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("\\\\localhost\\DB\\Sensor")]
-        public string SensorName {
+        [global::System.Configuration.DefaultSettingValueAttribute("JDI")]
+        public string Database {
             get {
-                return ((string)(this["SensorName"]));
+                return ((string)(this["Database"]));
             }
             set {
-                this["SensorName"] = value;
+                this["Database"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("\\\\localhost\\DB\\Sensor3Sigma")]
-        public string SensorUpperBound {
+        [global::System.Configuration.DefaultSettingValueAttribute("localhost")]
+        public string AFServer {
             get {
-                return ((string)(this["SensorUpperBound"]));
+                return ((string)(this["AFServer"]));
             }
             set {
-                this["SensorUpperBound"] = value;
+                this["AFServer"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Name:=*dflaj*template:= start > *-5dInprogress:True")]
+        public string EventFrameCurrentQuery {
+            get {
+                return ((string)(this["EventFrameCurrentQuery"]));
+            }
+            set {
+                this["EventFrameCurrentQuery"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Name:=*dflaj*template:= Inprogress:True")]
+        public string EventFrameTimeLessQuery {
+            get {
+                return ((string)(this["EventFrameTimeLessQuery"]));
+            }
+            set {
+                this["EventFrameTimeLessQuery"] = value;
             }
         }
     }

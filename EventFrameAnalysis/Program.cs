@@ -24,30 +24,29 @@ using OSIsoft.AF.Time;
 using OSIsoft.AF.Asset;
 using OSIsoft.AF.Data;
 using OSIsoft.AF.PI;
+                
+using OSIsoft.AF.Search;
 
 namespace EventFrameAnalysis
 {
     class Program
     {
         static PISystem pisystem = null;
-        static AFDatabase dataDB = null;
-        static AFDatabase statisticDB = null;
+        static AFDatabase afdatabse = null;
 
         static Timer refreshTimer = new Timer(1000);
         static object cookie;
         static ElapsedEventHandler elapsedEH = null;
         static EventHandler<AFChangedEventArgs> changedEH = null;
 
-        static AFElementTemplate eventFrameTemplate;
         static AFNamedCollectionList<AFEventFrame> eventFrames = null;
-        static string extendedPropertiesKey = EventFrameAnalysis.Properties.Settings.Default.ExtendedPropertyKey;
-        static IEnumerable<string> extendedPropertiesValues = new string[] { EventFrameAnalysis.Properties.Settings.Default.ExtendedPropertyValue };
+        static string extendedPropertiesKey = EventFrameAnalysis.Properties.Settings.Default.RecalculationInterval;
+        static IEnumerable<string> extendedPropertiesValues = new string[] { EventFrameAnalysis.Properties.Settings.Default.EventFrameQuery };
 
         static AFAttribute sensor;
         static List<AFValues> slices;
         static List<IDictionary<AFSummaryTypes, AFValue>> statisticsSlices = new List<IDictionary<AFSummaryTypes, AFValue>> { };
         static IDictionary<AFSummaryTypes, AFValues> statisticsTrends = new Dictionary<AFSummaryTypes, AFValues> { };                      
-        static Dictionary<AFSummaryTypes, AFAttribute> attributes;
 
         static AFTimeSpan interval = new AFTimeSpan(seconds: 1);
 
@@ -58,6 +57,8 @@ namespace EventFrameAnalysis
         static List<AFAttribute> boundAttributes;
 
         static AFEnumerationValue nodata;
+
+        static AFEventFrameSearch eventFrameQuery;
 
         public static void WaitForQuit()
         {
@@ -70,40 +71,28 @@ namespace EventFrameAnalysis
         static void Main(string[] args)
         {
             PISystems pisystems = new PISystems();
-            pisystem = pisystems[EventFrameAnalysis.Properties.Settings.Default.AFSystemName];
-            dataDB = pisystem.Databases[EventFrameAnalysis.Properties.Settings.Default.AFDataDB];
-            statisticDB = pisystem.Databases[EventFrameAnalysis.Properties.Settings.Default.AFStatisticsDB];
+            pisystem = pisystems[EventFrameAnalysis.Properties.Settings.Default.AFServer];
+            afdatabse = pisystem.Databases[EventFrameAnalysis.Properties.Settings.Default.Database];
 
-            PIServers servers = new PIServers();
-            PIServer server = servers[EventFrameAnalysis.Properties.Settings.Default.PIDataArchive];
+            PIServer server = new PIServers().DefaultPIServer;
             nodata = server.StateSets["SYSTEM"]["NO Data"];
 
-            AFElement element = statisticDB.Elements["DataStatistic"];
+            sensor = AFAttribute.FindAttribute(EventFrameAnalysis.Properties.Settings.Default.SensorPath, afdatabse);
 
-            
-            attributes = new Dictionary<AFSummaryTypes, AFAttribute> {
-                { AFSummaryTypes.Minimum, element.Attributes["Minimum"] },
-                { AFSummaryTypes.Maximum, element.Attributes["Maximum"] },
-                { AFSummaryTypes.Average, element.Attributes["Mean"] },
-                { AFSummaryTypes.StdDev, element.Attributes["StandardDev"] }
-            };
+            eventFrameQuery = new AFEventFrameSearch(afdatabse, "eventFrameSearch", EventFrameAnalysis.Properties.Settings.Default.EventFrameQuery);
 
             boundAttributes = new List<AFAttribute>
             {
-                element.Attributes["+3 sigma"],
-                element.Attributes["-3 sigma"]
+                AFAttribute.FindAttribute(EventFrameAnalysis.Properties.Settings.Default.LowerBoundPath, afdatabse),
+                AFAttribute.FindAttribute(EventFrameAnalysis.Properties.Settings.Default.UpperBoundPath, afdatabse)
             };
             bounds.Add(new AFValues());
             bounds.Add(new AFValues());
 
-            eventFrameTemplate = dataDB.ElementTemplates[EventFrameAnalysis.Properties.Settings.Default.EFTemplate];
-
-            sensor = element.Attributes["Sensor"];
-
-            InitialRun();
+            //InitialRun();
 
             // Initialize the cookie (bookmark)
-            dataDB.FindChangedItems(false, int.MaxValue, null, out cookie);
+            afdatabse.FindChangedItems(false, int.MaxValue, null, out cookie);
 
             // Initialize the timer, used to refresh the database
             elapsedEH = new System.Timers.ElapsedEventHandler(OnElapsed);
@@ -111,14 +100,14 @@ namespace EventFrameAnalysis
 
             // Set the function to be triggered once a change is detected
             changedEH = new EventHandler<AFChangedEventArgs>(OnChanged);
-            dataDB.Changed += changedEH;
+            afdatabse.Changed += changedEH;
 
             refreshTimer.Start();
 
             WaitForQuit();
 
             // Clean up
-            dataDB.Changed -= changedEH;
+            afdatabse.Changed -= changedEH;
             refreshTimer.Elapsed -= elapsedEH;
             refreshTimer.Stop();
         }
@@ -126,68 +115,36 @@ namespace EventFrameAnalysis
         internal static void InitialRun()
         {
             // Populate the mean and standard distribution tags base on the current pending event frame.
-            AFNamedCollectionList<AFEventFrame> recentEventFrames = AFEventFrame.FindEventFrames(database: dataDB,
-                                                                                                 searchRoot: null,
-                                                                                                 startTime: new AFTime("*"),
-                                                                                                 startIndex: 0,
-                                                                                                 maxCount: 1,
-                                                                                                 searchMode: AFEventFrameSearchMode.BackwardInProgress,
-                                                                                                 nameFilter: EventFrameAnalysis.Properties.Settings.Default.EventFrameName,
-                                                                                                 referencedElementNameFilter: "",
-                                                                                                 elemCategory: null,
-                                                                                                 elemTemplate: eventFrameTemplate,
-                                                                                                 searchFullHierarchy: true);
 
+          
             GetEventFrames();
             GetTrends();
             ComputeSatistics();
-            Stitch();
-            ComputeBounds();
 
-            if (recentEventFrames.Count > 0) {
+            /*
+            IEnumerable<AFEventFrame> recentEventFrames = GetCurrentEventFrame();
+
+            AFEventFrame newEF = new AFEventFrame(afdatabse);
+
+            if (recentEventFrames. > 0) {
                 AFEventFrame mostRecent = recentEventFrames[0];
                 WriteValues(mostRecent.StartTime);
             }
+            */
         }
 
-        internal static void GetEventFrames()
+
+        internal static AFEventFrames GetEventFrames()
         {
-            // Captures all strings with the correct extended property
-            eventFrames = new AFNamedCollectionList<AFEventFrame>();
-            string setting = EventFrameAnalysis.Properties.Settings.Default.WhichEventFramesToUse;
-
-            if (setting == "Recent" || setting == "Both")
-            {
-                int count = EventFrameAnalysis.Properties.Settings.Default.NumberOfRecentEventFrames;
-                AFNamedCollectionList<AFEventFrame> recentEventFrames = AFEventFrame.FindEventFrames(database: dataDB,
-                                                                                                     searchRoot: null,
-                                                                                                     startTime: new AFTime("*"),
-                                                                                                     startIndex: 0,
-                                                                                                     maxCount: count,
-                                                                                                     searchMode: AFEventFrameSearchMode.BackwardFromEndTime,
-                                                                                                     nameFilter: EventFrameAnalysis.Properties.Settings.Default.EventFrameName + "*",
-                                                                                                     referencedElementNameFilter: "",
-                                                                                                     elemCategory: null,
-                                                                                                     elemTemplate: eventFrameTemplate,
-                                                                                                     searchFullHierarchy: true);
-
-                eventFrames.AddRange(recentEventFrames);
-            }
-
-            if (setting == "Golden" || setting == "Both")
-            {
-                IList<KeyValuePair<string, AFEventFrame>> searchedEventFrames = AFEventFrame.FindEventFramesByExtendedProperty(database: dataDB,
-                                                                                                                               propertyName: extendedPropertiesKey,
-                                                                                                                               values: extendedPropertiesValues,
-                                                                                                                               maxCount: Int32.MaxValue);
-
-                foreach (KeyValuePair<string, AFEventFrame> pair in searchedEventFrames)
-                {
-                    AFEventFrame frame = pair.Value;
-                    eventFrames.Add(frame);
-                }
-            }
+            IEnumerable<AFEventFrame> eventFrames = eventFrameQuery.FindEventFrames(0, true, int.MaxValue);
+            eventFrames.OrderBy(frame => frame.StartTime); // Needed?
         }
+
+        internal static AFEventFrames GetCurrentEventFrame()
+        {
+            return currentEventFrameQuery.FindEventFrames();
+        }
+
 
         internal static void GetTrends()
         {
@@ -203,59 +160,25 @@ namespace EventFrameAnalysis
         internal static void ComputeSatistics()
         {
             statisticsSlices.Clear();
-            foreach (AFValues slice in slices)
-            {
-                statisticsSlices.Add(GetStatistics(slice));
-            }
-        }
-
-        internal static void ComputeBounds()
-        {
             bounds[0].Clear();
             bounds[1].Clear();
-            int index = 0;
-             foreach(AFValue mean in statisticsTrends[AFSummaryTypes.Average])
+            foreach (AFValues slice in slices)
             {
-                AFValue stddev = statisticsTrends[AFSummaryTypes.StdDev][index];
-                AFValue upper = new AFValue(mean.ValueAsDouble() + 3 * stddev.ValueAsDouble(), mean.Timestamp);
-                AFValue lower = new AFValue(mean.ValueAsDouble() - 3 * stddev.ValueAsDouble(), mean.Timestamp);
-                bounds[0].Add(upper);
-                bounds[1].Add(lower);
-                index++;
+                IDictionary<AFSummaryTypes, AFValue> statisticForSlice = GetStatistics(slice);
+                AFTime time = statisticForSlice[AFSummaryTypes.Average].Timestamp;
+                Double mean = statisticForSlice[AFSummaryTypes.Average].ValueAsDouble();
+                Double stddev = statisticForSlice[AFSummaryTypes.StdDev].ValueAsDouble();
+                bounds[0].Add(new AFValue(mean + 3 * stddev, time));
+                bounds[1].Add(new AFValue(mean - 3 * stddev, time));
             }
         }
 
-        internal static void Stitch()
-        {
-            statisticsTrends.Clear();
-            foreach (AFSummaryTypes type in types)
-            {
-                statisticsTrends[type] = new AFValues();
-            }
-
-            // Takes all statistics and recreates an trend
-            foreach (Dictionary<AFSummaryTypes, AFValue> statisticSlice in statisticsSlices)
-            {
-                foreach (KeyValuePair<AFSummaryTypes, AFValue> pair in statisticSlice)
-                {
-                    statisticsTrends[pair.Key].Add(pair.Value);
-                }
-            }
-        }
 
         internal static void WriteValues(AFTime startTime)
         {
             AFTime lastTime;
             AFValue nodataValue;
-            foreach (AFSummaryTypes type in types)
-            {
-                lastTime = timeShift(statisticsTrends[type], startTime);
-                attributes[type].Data.UpdateValues(statisticsTrends[type], AFUpdateOption.Insert);
-                // Write no data at the end of each trend
-                nodataValue = new AFValue(nodata, lastTime);
-            
-                attributes[type].PIPoint.UpdateValue(nodataValue, AFUpdateOption.Insert);
-            }
+
             for (int i = 0; i < 2; i++) { 
                 lastTime = timeShift(bounds[i], startTime);
                 boundAttributes[i].Data.UpdateValues(bounds[i], AFUpdateOption.Insert);
@@ -284,7 +207,7 @@ namespace EventFrameAnalysis
         {
             // Find changes since the last refresh
             List<AFChangeInfo> changes = new List<AFChangeInfo>();
-            changes.AddRange(dataDB.FindChangedItems(true, int.MaxValue, cookie, out cookie));
+            changes.AddRange(afdatabse.FindChangedItems(true, int.MaxValue, cookie, out cookie));
 
             // Refresh objects that have been changed.
             AFChangeInfo.Refresh(pisystem, changes);
@@ -294,11 +217,11 @@ namespace EventFrameAnalysis
             {
                 if (info.Identity == AFIdentity.EventFrame)
                 {
+                    AFEventFrame lastestEventFrame = (AFEventFrame)info.FindObject(pisystem, true);
+
                     if (info.Action == AFChangeInfoAction.Added)
                     {
-                        AFEventFrame lastestEventFrame = (AFEventFrame)info.FindObject(pisystem, true);
-                         
-                        if (lastestEventFrame.Template.Name == EventFrameAnalysis.Properties.Settings.Default.EFTemplate && lastestEventFrame.Name.StartsWith(EventFrameAnalysis.Properties.Settings.Default.EventFrameName))
+                        if (lastestEventFrame.Template.Name == EventFrameAnalysis.Properties.Settings.Default.LowerBoundPath && lastestEventFrame.Name.StartsWith(EventFrameAnalysis.Properties.Settings.Default.EventFrameName))
                         {
                             WriteValues(lastestEventFrame.StartTime);
                         }
@@ -308,8 +231,6 @@ namespace EventFrameAnalysis
                         GetEventFrames();
                         GetTrends();
                         ComputeSatistics();
-                        Stitch();
-                        ComputeBounds();
                     }
                 }
             }
@@ -319,9 +240,9 @@ namespace EventFrameAnalysis
         {
             // Refreshing Database will cause any external changes to be seen which will
             // result in the triggering of the OnChanged event handler
-            lock (dataDB)
+            lock (afdatabse)
             {
-                dataDB.Refresh();
+                afdatabse.Refresh();
             }
             refreshTimer.Start();
         }
