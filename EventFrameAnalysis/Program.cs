@@ -132,7 +132,7 @@ namespace EventFrameAnalysis
             AFValue nodataValue = new AFValue(nodata);
             for (int i = 0; i < 2; i++) {
                 nodataValue.Timestamp = timeShift(bounds[i], startTime);
-                boundAttributes[i].Data.UpdateValues(bounds[i], AFUpdateOption.Insert);
+                boundAttributes[i].PIPoint.UpdateValues(bounds[i], AFUpdateOption.Insert);
                 boundAttributes[i].PIPoint.UpdateValue(nodataValue, AFUpdateOption.Insert);
             }
         }

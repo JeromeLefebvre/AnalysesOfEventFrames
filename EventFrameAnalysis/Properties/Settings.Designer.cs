@@ -61,7 +61,7 @@ namespace EventFrameAnalysis.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Name:=\"*Even*\" Start:>*-10m Inprogress:False")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Name:=\"*Short*\" Start:>*-3Days Inprogress:False")]
         public string EventFrameQuery {
             get {
                 return ((string)(this["EventFrameQuery"]));
@@ -94,7 +94,7 @@ namespace EventFrameAnalysis.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Name:=\"*Even*\" Start:>*-3Days Inprogress:True")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Name:=\"*Short*\" Start:>*-3Days Inprogress:True")]
         public string EventFrameCurrentQuery {
             get {
                 return ((string)(this["EventFrameCurrentQuery"]));
@@ -106,7 +106,7 @@ namespace EventFrameAnalysis.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Name:=\"*Even*\"")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Name:=\"*Short*\"")]
         public string EventFrameTimeLessQuery {
             get {
                 return ((string)(this["EventFrameTimeLessQuery"]));
