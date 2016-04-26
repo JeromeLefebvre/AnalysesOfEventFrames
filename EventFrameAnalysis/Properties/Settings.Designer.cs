@@ -25,7 +25,7 @@ namespace EventFrameAnalysis.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("\\data|sensor")]
+        [global::System.Configuration.DefaultSettingValueAttribute("\\\\localhost\\JDIData\\DataGeneration|sensor")]
         public string SensorPath {
             get {
                 return ((string)(this["SensorPath"]));
@@ -34,7 +34,7 @@ namespace EventFrameAnalysis.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("\\data|upper")]
+        [global::System.Configuration.DefaultSettingValueAttribute("\\\\localhost\\JDIData\\DataGeneration|sensor|HiHi")]
         public string UpperBoundPath {
             get {
                 return ((string)(this["UpperBoundPath"]));
@@ -43,7 +43,7 @@ namespace EventFrameAnalysis.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("\\data|lower")]
+        [global::System.Configuration.DefaultSettingValueAttribute("\\\\localhost\\JDIData\\DataGeneration|sensor|LoLo")]
         public string LowerBoundPath {
             get {
                 return ((string)(this["LowerBoundPath"]));
@@ -61,7 +61,7 @@ namespace EventFrameAnalysis.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Name:=*dflaj*template:= start > *-5d")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Name:=\"*Even*\" Start:>*-10m Inprogress:False")]
         public string EventFrameQuery {
             get {
                 return ((string)(this["EventFrameQuery"]));
@@ -70,7 +70,7 @@ namespace EventFrameAnalysis.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("JDI")]
+        [global::System.Configuration.DefaultSettingValueAttribute("JDIData")]
         public string Database {
             get {
                 return ((string)(this["Database"]));
@@ -94,7 +94,7 @@ namespace EventFrameAnalysis.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Name:=*dflaj*template:= start > *-5dInprogress:True")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Name:=\"*Even*\" Start:>*-3Days Inprogress:True")]
         public string EventFrameCurrentQuery {
             get {
                 return ((string)(this["EventFrameCurrentQuery"]));
@@ -106,7 +106,7 @@ namespace EventFrameAnalysis.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Name:=*dflaj*template:= Inprogress:True")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Name:=\"*Even*\"")]
         public string EventFrameTimeLessQuery {
             get {
                 return ((string)(this["EventFrameTimeLessQuery"]));
