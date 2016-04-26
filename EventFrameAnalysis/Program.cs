@@ -42,6 +42,7 @@ namespace EventFrameAnalysis
 
         static AFEventFrameSearch eventFrameQuery;
         static AFEventFrameSearch currentEventFrameQuery;
+        static AFEventFrameSearch timeLessQuery;
         static AFAttribute sensor;
         static List<AFValues> bounds = new List<AFValues> { new AFValues(), new AFValues() };
         static List<AFAttribute> boundAttributes;
@@ -65,7 +66,8 @@ namespace EventFrameAnalysis
             nodata = server.StateSets["SYSTEM"]["NO Data"];
 
             eventFrameQuery = new AFEventFrameSearch(afdatabse, "eventFrameSearch", Properties.Settings.Default.EventFrameQuery);
-            currentEventFrameQuery = new AFEventFrameSearch(afdatabse, "eventFrameSearch", Properties.Settings.Default.EventFrameCurrentQuery);
+            currentEventFrameQuery = new AFEventFrameSearch(afdatabse, "currentEvent", Properties.Settings.Default.EventFrameCurrentQuery);
+            timeLessQuery = new AFEventFrameSearch(afdatabse, "AllEventFrames", Properties.Settings.Default.EventFrameTimeLessQuery);
 
             sensor = AFAttribute.FindAttribute(Properties.Settings.Default.SensorPath, null);
             boundAttributes = new List<AFAttribute>
@@ -165,11 +167,13 @@ namespace EventFrameAnalysis
             // Go over all changes and only continue further if the new object is an newly added event frame of the stated event frame
             foreach (AFChangeInfo info in changes)
             {
-                if (info.Identity == AFIdentity.EventFrame)
+               if (info.Identity == AFIdentity.EventFrame)
                 {
                     AFEventFrame lastestEventFrame = (AFEventFrame)info.FindObject(pisystem, true);
 
-                    if (currentEventFrameQuery.IsMatch(lastestEventFrame)) { 
+                    bool check = timeLessQuery.IsMatch(lastestEventFrame);
+
+                    if (timeLessQuery.IsMatch(lastestEventFrame)) { 
                         if (info.Action == AFChangeInfoAction.Added)
                         {
                             WriteValues(lastestEventFrame.StartTime);

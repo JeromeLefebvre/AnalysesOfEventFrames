@@ -15,7 +15,7 @@
       <Value Profile="(Default)">300</Value>
     </Setting>
     <Setting Name="EventFrameQuery" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">Name:="*Short*" Start:&gt;*-3Days Inprogress:False</Value>
+      <Value Profile="(Default)">Name:="*Short*" Start:&gt;*-10m Inprogress:False</Value>
     </Setting>
     <Setting Name="Database" Type="System.String" Scope="User">
       <Value Profile="(Default)">JDIData</Value>
@@ -24,7 +24,7 @@
       <Value Profile="(Default)">localhost</Value>
     </Setting>
     <Setting Name="EventFrameCurrentQuery" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Name:="*Short*" Start:&gt;*-3Days Inprogress:True</Value>
+      <Value Profile="(Default)">Name:="*Short*" Start:&gt;*-3Days Inprogress=True</Value>
     </Setting>
     <Setting Name="EventFrameTimeLessQuery" Type="System.String" Scope="User">
       <Value Profile="(Default)">Name:="*Short*"</Value>
