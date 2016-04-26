@@ -30,41 +30,28 @@ namespace EventFrameAnalysis
 {
     class Program
     {
-        static PISystem pisystem = null;
-        static AFDatabase afdatabse = null;
-
         static Timer refreshTimer = new Timer(1000);
         static object cookie;
         static ElapsedEventHandler elapsedEH = null;
         static EventHandler<AFChangedEventArgs> changedEH = null;
 
-        static IEnumerable<AFEventFrame> eventFrames;
-        static string extendedPropertiesKey = Properties.Settings.Default.RecalculationInterval;
-        static IEnumerable<string> extendedPropertiesValues = new string[] { Properties.Settings.Default.EventFrameQuery };
-
-        static AFAttribute sensor;
-        static List<AFValues> slices;
-        static List<IDictionary<AFSummaryTypes, AFValue>> statisticsSlices = new List<IDictionary<AFSummaryTypes, AFValue>> { };
-        static IDictionary<AFSummaryTypes, AFValues> statisticsTrends = new Dictionary<AFSummaryTypes, AFValues> { };                      
-
-        static AFTimeSpan interval = new AFTimeSpan(seconds: 1);
-
-        static List<AFSummaryTypes> types = new List<AFSummaryTypes> { AFSummaryTypes.Average, AFSummaryTypes.StdDev };
-        static AFSummaryTypes typesCheck = AFSummaryTypes.Average | AFSummaryTypes.StdDev;
-
-        static List<AFValues> bounds = new List<AFValues> { };
-        static List<AFAttribute> boundAttributes;
-
+        static PISystem pisystem = null;
+        static AFDatabase afdatabse = null;
         static AFEnumerationValue nodata;
+        static AFTimeSpan interval = new AFTimeSpan(seconds: 1);
 
         static AFEventFrameSearch eventFrameQuery;
         static AFEventFrameSearch currentEventFrameQuery;
+        static AFAttribute sensor;
+        static List<AFValues> bounds = new List<AFValues> { new AFValues(), new AFValues() };
+        static List<AFAttribute> boundAttributes;
 
         public static void WaitForQuit()
         {
             do
             {
                 Console.Write("Enter Q to exit the program: ");
+                System.GC.Collect();
             } while (Console.ReadLine() != "Q");
         }
 
@@ -77,17 +64,15 @@ namespace EventFrameAnalysis
             PIServer server = new PIServers().DefaultPIServer;
             nodata = server.StateSets["SYSTEM"]["NO Data"];
 
-            sensor = AFAttribute.FindAttribute(Properties.Settings.Default.SensorPath, afdatabse);
-
             eventFrameQuery = new AFEventFrameSearch(afdatabse, "eventFrameSearch", Properties.Settings.Default.EventFrameQuery);
             currentEventFrameQuery = new AFEventFrameSearch(afdatabse, "eventFrameSearch", Properties.Settings.Default.EventFrameCurrentQuery);
+
+            sensor = AFAttribute.FindAttribute(Properties.Settings.Default.SensorPath, null);
             boundAttributes = new List<AFAttribute>
             {
-                AFAttribute.FindAttribute(Properties.Settings.Default.LowerBoundPath, afdatabse),
-                AFAttribute.FindAttribute(Properties.Settings.Default.UpperBoundPath, afdatabse)
+                AFAttribute.FindAttribute(Properties.Settings.Default.LowerBoundPath, null),
+                AFAttribute.FindAttribute(Properties.Settings.Default.UpperBoundPath, null)
             };
-            bounds.Add(new AFValues());
-            bounds.Add(new AFValues());
 
             InitialRun();
 
@@ -101,12 +86,10 @@ namespace EventFrameAnalysis
             // Set the function to be triggered once a change is detected
             changedEH = new EventHandler<AFChangedEventArgs>(OnChanged);
             afdatabse.Changed += changedEH;
-
             refreshTimer.Start();
 
             WaitForQuit();
 
-            // Clean up
             afdatabse.Changed -= changedEH;
             refreshTimer.Elapsed -= elapsedEH;
             refreshTimer.Stop();
@@ -114,44 +97,23 @@ namespace EventFrameAnalysis
 
         internal static void InitialRun()
         {
-            GetEventFrames();
-            GetTrends();
-            ComputeSatistics();
-
-            if (currentEventFrameQuery.GetTotalCount() == 1) {
-                AFEventFrame currentEventFrame = GetCurrentEventFrame().ToList()[0];
+            ComputeStatistics();
+            IEnumerable <AFEventFrame> currentEventFrames = currentEventFrameQuery.FindEventFrames(0, true, int.MaxValue);
+            foreach (AFEventFrame currentEventFrame in currentEventFrames) {
                 WriteValues(currentEventFrame.StartTime);
             }
-            
         }
 
-
-        internal static void GetEventFrames()
+        internal static void ComputeStatistics()
         {
-            eventFrames = eventFrameQuery.FindEventFrames(0, true, int.MaxValue);
-        }
-
-        internal static IEnumerable<AFEventFrame> GetCurrentEventFrame()
-        {
-            return currentEventFrameQuery.FindEventFrames(0, true, int.MaxValue);
-        }
-
-
-        internal static void GetTrends()
-        {
-            // Gets all the data for the sensor attribute for the various event frames
+            IEnumerable<AFEventFrame> eventFrames = eventFrameQuery.FindEventFrames(0, true, int.MaxValue);
             List<AFValues> trends = new List<AFValues>();
             foreach (AFEventFrame EF in eventFrames)
             {
                 trends.Add(sensor.Data.InterpolatedValues(EF.TimeRange, interval, null, "", true));
             }
-            //eventFrames = null;
-            slices = GetSlices(trends);
-        }
+            List<AFValues> slices = GetSlices(trends);
 
-        internal static void ComputeSatistics()
-        {
-            statisticsSlices.Clear();
             bounds[0].Clear();
             bounds[1].Clear();
             foreach (AFValues slice in slices)
@@ -178,7 +140,7 @@ namespace EventFrameAnalysis
         public static IDictionary<AFSummaryTypes, AFValue> GetStatistics(AFValues values)
         {
             AFTimeRange range = new AFTimeRange(values[0].Timestamp, values[values.Count - 1].Timestamp);
-            return values.Summary(range, typesCheck, AFCalculationBasis.EventWeighted, AFTimestampCalculation.MostRecentTime);
+            return values.Summary(range, AFSummaryTypes.Average | AFSummaryTypes.StdDev, AFCalculationBasis.EventWeighted, AFTimestampCalculation.MostRecentTime);
         }
 
         internal static AFTime timeShift(AFValues values, AFTime startTime)
@@ -214,9 +176,7 @@ namespace EventFrameAnalysis
                         }
                         else if (info.Action == AFChangeInfoAction.Updated || info.Action == AFChangeInfoAction.Removed)
                         {
-                            GetEventFrames();
-                            GetTrends();
-                            ComputeSatistics();
+                            ComputeStatistics();
                         }
                     }
                 }
