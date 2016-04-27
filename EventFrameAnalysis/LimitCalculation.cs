@@ -86,6 +86,11 @@ namespace EventFrameAnalysis
 
         public static IDictionary<AFSummaryTypes, AFValue> GetStatistics(AFValues values)
         {
+            /*
+            if (values.Count == 1) {
+                IDictionary < AFSummaryTypes, AFValue > oneValue = new IDictionary<AFSummaryTypes, AFValue>();
+            }
+                  */
             AFTimeRange range = new AFTimeRange(values[0].Timestamp, values[values.Count - 1].Timestamp);
             return values.Summary(range, AFSummaryTypes.Average | AFSummaryTypes.StdDev, AFCalculationBasis.EventWeighted, AFTimestampCalculation.MostRecentTime);
         }

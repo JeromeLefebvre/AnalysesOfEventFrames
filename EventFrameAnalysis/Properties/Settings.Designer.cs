@@ -25,7 +25,7 @@ namespace EventFrameAnalysis.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("\\\\localhost\\JDIData\\DataGeneration|sensor")]
+        [global::System.Configuration.DefaultSettingValueAttribute("\\\\localhost\\JDIData\\DataShort|sensor")]
         public string SensorPath {
             get {
                 return ((string)(this["SensorPath"]));

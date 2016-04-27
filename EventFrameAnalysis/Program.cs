@@ -33,7 +33,7 @@ namespace EventFrameAnalysis
         static PISystem pisystem ;
         static AFDatabase afdatabse;
         static AFAttribute sensor;
-        static LimitCalculation calculation;
+        static List<LimitCalculation> calculations;
 
         public static void WaitForQuit()
         {
@@ -49,7 +49,10 @@ namespace EventFrameAnalysis
             pisystem = sensor.PISystem;
             afdatabse = sensor.Database;
 
-            calculation = new LimitCalculation(Properties.Settings.Default.SensorPath, Properties.Settings.Default.EventFrameQuery);
+            calculations = new List<LimitCalculation>{
+                new LimitCalculation(Properties.Settings.Default.SensorPath, Properties.Settings.Default.EventFrameQuery),
+                new LimitCalculation(@"\\localhost\JDIData\DataEven|sensor", @"Name:=""*Even*"" Start:>*-10m InProgress:=False")
+            };
 
             // Initialize the cookie (bookmark)
             afdatabse.FindChangedItems(false, int.MaxValue, null, out cookie);
@@ -80,7 +83,11 @@ namespace EventFrameAnalysis
             foreach (AFChangeInfo info in changes.FindAll(i => i.Identity == AFIdentity.EventFrame))
             {
                 AFEventFrame lastestEventFrame = (AFEventFrame)info.FindObject(pisystem, true);
-                calculation.performAction(lastestEventFrame, info.Action);
+                
+                foreach (LimitCalculation calculation in calculations)
+                {
+                    calculation.performAction(lastestEventFrame, info.Action);
+                }
             }
         }
 

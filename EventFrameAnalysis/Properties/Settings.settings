@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="SensorPath" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">\\localhost\JDIData\DataGeneration|sensor</Value>
+      <Value Profile="(Default)">\\localhost\JDIData\DataShort|sensor</Value>
     </Setting>
     <Setting Name="EventFrameQuery" Type="System.String" Scope="Application">
       <Value Profile="(Default)">Name:="*Short*" Start:&gt;*-10m InProgress:=False</Value>
