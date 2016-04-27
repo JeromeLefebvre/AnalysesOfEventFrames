@@ -41,7 +41,6 @@ namespace EventFrameAnalysis
         static AFTimeSpan interval = new AFTimeSpan(seconds: 1);
 
         static AFEventFrameSearch eventFrameQuery;
-        static AFEventFrameSearch currentEventFrameQuery;
         static AFEventFrameSearch timeLessQuery;
         static AFAttribute sensor;
         static List<AFValues> bounds = new List<AFValues> { new AFValues(), new AFValues() };
@@ -52,30 +51,22 @@ namespace EventFrameAnalysis
             do
             {
                 Console.Write("Enter Q to exit the program: ");
-                System.GC.Collect();
             } while (Console.ReadLine() != "Q");
         }
 
         static void Main(string[] args)
         {
-            PISystems pisystems = new PISystems();
-            pisystem = pisystems[Properties.Settings.Default.AFServer];
-            afdatabse = pisystem.Databases[Properties.Settings.Default.Database];
-
-            PIServer server = new PIServers().DefaultPIServer;
-            nodata = server.StateSets["SYSTEM"]["NO Data"];
+            sensor = AFAttribute.FindAttribute(Properties.Settings.Default.SensorPath, null);
+            pisystem = sensor.PISystem;
+            afdatabse = sensor.Database;
+            nodata = (new PIServers().DefaultPIServer).StateSets["SYSTEM"]["NO Data"];
+            boundAttributes = new List<AFAttribute> { sensor.GetAttributeByTrait(AFAttributeTrait.LimitLoLo), sensor.GetAttributeByTrait(AFAttributeTrait.LimitHiHi) };
 
             eventFrameQuery = new AFEventFrameSearch(afdatabse, "eventFrameSearch", Properties.Settings.Default.EventFrameQuery);
-            currentEventFrameQuery = new AFEventFrameSearch(afdatabse, "currentEvent", Properties.Settings.Default.EventFrameCurrentQuery);
-            timeLessQuery = new AFEventFrameSearch(afdatabse, "AllEventFrames", Properties.Settings.Default.EventFrameTimeLessQuery);
-
-            sensor = AFAttribute.FindAttribute(Properties.Settings.Default.SensorPath, null);
-            boundAttributes = new List<AFAttribute>
-            {
-                AFAttribute.FindAttribute(Properties.Settings.Default.LowerBoundPath, null),
-                AFAttribute.FindAttribute(Properties.Settings.Default.UpperBoundPath, null)
-            };
-
+            List<AFSearchToken> tokens = eventFrameQuery.Tokens.ToList();
+            tokens.RemoveAll(t => t.Filter == AFSearchFilter.InProgress || t.Filter == AFSearchFilter.Start || t.Filter == AFSearchFilter.End);
+            timeLessQuery = new AFEventFrameSearch(afdatabse, "AllEventFrames", tokens);
+           
             InitialRun();
 
             // Initialize the cookie (bookmark)
@@ -100,6 +91,8 @@ namespace EventFrameAnalysis
         internal static void InitialRun()
         {
             ComputeStatistics();
+            AFEventFrameSearch currentEventFrameQuery = new AFEventFrameSearch(afdatabse, "currentEvent", eventFrameQuery.Tokens.ToList());
+            currentEventFrameQuery.Tokens.Add(new AFSearchToken(AFSearchFilter.InProgress, AFSearchOperator.Equal, "True"));
             IEnumerable <AFEventFrame> currentEventFrames = currentEventFrameQuery.FindEventFrames(0, true, int.MaxValue);
             foreach (AFEventFrame currentEventFrame in currentEventFrames) {
                 WriteValues(currentEventFrame.StartTime);
@@ -155,33 +148,39 @@ namespace EventFrameAnalysis
             return startTime;
         }
 
+        public static List<AFValues> GetSlices(List<AFValues> trends)
+        {
+            List<AFValues> outer = new List<AFValues>();
+            for (int j = 0; j < trends.Count; j++)
+            {
+                for (int i = 0; i < trends[j].Count; i++)
+                {
+                    if (outer.Count <= i)
+                        outer.Add(new AFValues());
+                    outer[i].Add(trends[j][i]);
+                }
+            }
+            return outer;
+        }
+
         internal static void OnChanged(object sender, AFChangedEventArgs e)
         {
             // Find changes since the last refresh
             List<AFChangeInfo> changes = new List<AFChangeInfo>();
             changes.AddRange(afdatabse.FindChangedItems(true, int.MaxValue, cookie, out cookie));
-
-            // Refresh objects that have been changed.
             AFChangeInfo.Refresh(pisystem, changes);
 
-            // Go over all changes and only continue further if the new object is an newly added event frame of the stated event frame
-            foreach (AFChangeInfo info in changes)
+            foreach (AFChangeInfo info in changes.FindAll(i => i.Identity == AFIdentity.EventFrame))
             {
-               if (info.Identity == AFIdentity.EventFrame)
-                {
-                    AFEventFrame lastestEventFrame = (AFEventFrame)info.FindObject(pisystem, true);
-
-                    bool check = timeLessQuery.IsMatch(lastestEventFrame);
-
-                    if (timeLessQuery.IsMatch(lastestEventFrame)) { 
-                        if (info.Action == AFChangeInfoAction.Added)
-                        {
-                            WriteValues(lastestEventFrame.StartTime);
-                        }
-                        else if (info.Action == AFChangeInfoAction.Updated || info.Action == AFChangeInfoAction.Removed)
-                        {
-                            ComputeStatistics();
-                        }
+                AFEventFrame lastestEventFrame = (AFEventFrame)info.FindObject(pisystem, true);
+                if (timeLessQuery.IsMatch(lastestEventFrame)) { 
+                    if (info.Action == AFChangeInfoAction.Added)
+                    {
+                        WriteValues(lastestEventFrame.StartTime);
+                    }
+                    else if (info.Action == AFChangeInfoAction.Updated || info.Action == AFChangeInfoAction.Removed)
+                    {
+                        ComputeStatistics();
                     }
                 }
             }
@@ -189,31 +188,12 @@ namespace EventFrameAnalysis
 
         internal static void OnElapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            // Refreshing Database will cause any external changes to be seen which will
-            // result in the triggering of the OnChanged event handler
+            // Refreshing Database will cause any external changes to be seen which will result in the triggering of the OnChanged event handler
             lock (afdatabse)
             {
                 afdatabse.Refresh();
             }
             refreshTimer.Start();
-        }
-
-        public static List<AFValues> GetSlices(List<AFValues> trends)
-        {
-            int longest = trends.Any() ? trends.Max(l => l.Count) : 0;
-            List<AFValues> outer = new List<AFValues>();
-            for (int i = 0; i < longest; i++)
-            {
-                outer.Add(new AFValues());
-            }
-            for (int j = 0; j < trends.Count; j++)
-            {
-                for (int i = 0; i < trends[j].Count; i++)
-                {
-                    outer[i].Add(trends[j][i]);
-                }
-            }
-            return outer;
         }
     }
 }

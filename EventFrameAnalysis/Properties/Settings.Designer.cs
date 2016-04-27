@@ -34,85 +34,10 @@ namespace EventFrameAnalysis.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("\\\\localhost\\JDIData\\DataGeneration|sensor|HiHi")]
-        public string UpperBoundPath {
-            get {
-                return ((string)(this["UpperBoundPath"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("\\\\localhost\\JDIData\\DataGeneration|sensor|LoLo")]
-        public string LowerBoundPath {
-            get {
-                return ((string)(this["LowerBoundPath"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("300")]
-        public string RecalculationInterval {
-            get {
-                return ((string)(this["RecalculationInterval"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Name:=\"*Short*\" Start:>*-10m Inprogress:False")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Name:=\"*Short*\" Start:>*-10m InProgress:=False")]
         public string EventFrameQuery {
             get {
                 return ((string)(this["EventFrameQuery"]));
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("JDIData")]
-        public string Database {
-            get {
-                return ((string)(this["Database"]));
-            }
-            set {
-                this["Database"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("localhost")]
-        public string AFServer {
-            get {
-                return ((string)(this["AFServer"]));
-            }
-            set {
-                this["AFServer"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Name:=\"*Short*\" Start:>*-3Days Inprogress=True")]
-        public string EventFrameCurrentQuery {
-            get {
-                return ((string)(this["EventFrameCurrentQuery"]));
-            }
-            set {
-                this["EventFrameCurrentQuery"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Name:=\"*Short*\"")]
-        public string EventFrameTimeLessQuery {
-            get {
-                return ((string)(this["EventFrameTimeLessQuery"]));
-            }
-            set {
-                this["EventFrameTimeLessQuery"] = value;
             }
         }
     }
