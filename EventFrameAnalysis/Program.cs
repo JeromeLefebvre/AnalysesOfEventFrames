@@ -20,6 +20,8 @@ using System.Collections.Generic;
 using OSIsoft.AF;
 using OSIsoft.AF.EventFrame;
 using OSIsoft.AF.Asset;
+using System.IO;
+using Newtonsoft.Json;
 
 namespace EventFrameAnalysis
 {
@@ -46,13 +48,21 @@ namespace EventFrameAnalysis
         static void Main(string[] args)
         {
             sensor = AFAttribute.FindAttribute(Properties.Settings.Default.SensorPath, null);
-            pisystem = sensor.PISystem;
+            //pisystem = sensor.PISystem;
             afdatabse = sensor.Database;
+            List<CalculationPreference> calculationPreferences;
 
-            calculations = new List<LimitCalculation>{
-                new LimitCalculation(Properties.Settings.Default.SensorPath, Properties.Settings.Default.EventFrameQuery),
-                new LimitCalculation(@"\\localhost\JDIData\DataEven|sensor", @"Name:=""*Even*"" Start:>*-10m InProgress:=False")
-            };
+            string path = @"C:\Users\jlefebvre\Desktop\setting.json";
+
+            string preferenceText = File.ReadAllText(path);
+            calculationPreferences = JsonConvert.DeserializeObject<List<CalculationPreference>>(preferenceText);
+
+            calculations = new List<LimitCalculation> { };
+
+            foreach (CalculationPreference pref in calculationPreferences)
+            {
+                calculations.Add(new LimitCalculation(pref.sensorPath, pref.eventFrameQuery));
+            } 
 
             // Initialize the cookie (bookmark)
             afdatabse.FindChangedItems(false, int.MaxValue, null, out cookie);
@@ -78,11 +88,11 @@ namespace EventFrameAnalysis
             // Find changes since the last refresh
             List<AFChangeInfo> changes = new List<AFChangeInfo>();
             changes.AddRange(afdatabse.FindChangedItems(true, int.MaxValue, cookie, out cookie));
-            AFChangeInfo.Refresh(pisystem, changes);
+            AFChangeInfo.Refresh(afdatabse.PISystem, changes);
 
             foreach (AFChangeInfo info in changes.FindAll(i => i.Identity == AFIdentity.EventFrame))
             {
-                AFEventFrame lastestEventFrame = (AFEventFrame)info.FindObject(pisystem, true);
+                AFEventFrame lastestEventFrame = (AFEventFrame)info.FindObject(afdatabse.PISystem, true);
                 
                 foreach (LimitCalculation calculation in calculations)
                 {

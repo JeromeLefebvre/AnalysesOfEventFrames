@@ -12,23 +12,22 @@ namespace EventFrameAnalysis
 {
     class LimitCalculation
     {
-        static PISystem pisystem = null;
-        static AFDatabase afdatabse = null;
-        static AFEnumerationValue nodata;
+        private PISystem pisystem = null;
+        private AFDatabase afdatabse = null;
+        static readonly AFEnumerationValue nodata = (new PIServers().DefaultPIServer).StateSets["SYSTEM"]["NO Data"];
         static AFTimeSpan interval = new AFTimeSpan(seconds: 1);
 
-        static AFEventFrameSearch eventFrameQuery;
-        static AFEventFrameSearch timeLessQuery;
-        static AFAttribute sensor;
-        static List<AFValues> bounds = new List<AFValues> { new AFValues(), new AFValues() };
-        static List<AFAttribute> boundAttributes;
+        private readonly AFEventFrameSearch eventFrameQuery;
+        private readonly AFEventFrameSearch timeLessQuery;
+        private readonly AFAttribute sensor;
+        private List<AFValues> bounds = new List<AFValues> { new AFValues(), new AFValues() };
+        private List<AFAttribute> boundAttributes;
 
         public LimitCalculation(string afattributepath, string eventQuery)
         {
             sensor = AFAttribute.FindAttribute(afattributepath, null);
             pisystem = sensor.PISystem;
             afdatabse = sensor.Database;
-            nodata = (new PIServers().DefaultPIServer).StateSets["SYSTEM"]["NO Data"];
             boundAttributes = new List<AFAttribute> { sensor.GetAttributeByTrait(AFAttributeTrait.LimitLoLo), sensor.GetAttributeByTrait(AFAttributeTrait.LimitHiHi) };
 
             eventFrameQuery = new AFEventFrameSearch(afdatabse, "eventFrameSearch", eventQuery);
@@ -38,7 +37,7 @@ namespace EventFrameAnalysis
             InitialRun();
         }
 
-        internal static void InitialRun()
+        internal void InitialRun()
         {
             ComputeStatistics();
             AFEventFrameSearch currentEventFrameQuery = new AFEventFrameSearch(afdatabse, "currentEvent", eventFrameQuery.Tokens.ToList());
@@ -50,7 +49,7 @@ namespace EventFrameAnalysis
             }
         }
 
-        internal static void ComputeStatistics()
+        internal void ComputeStatistics()
         {
             IEnumerable<AFEventFrame> eventFrames = eventFrameQuery.FindEventFrames(0, true, int.MaxValue);
             List<AFValues> trends = new List<AFValues>();
@@ -73,7 +72,7 @@ namespace EventFrameAnalysis
             }
         }
 
-        internal static void WriteValues(AFTime startTime)
+        internal void WriteValues(AFTime startTime)
         {
             AFValue nodataValue = new AFValue(nodata);
             for (int i = 0; i < 2; i++)
@@ -86,13 +85,19 @@ namespace EventFrameAnalysis
 
         public static IDictionary<AFSummaryTypes, AFValue> GetStatistics(AFValues values)
         {
-            /*
-            if (values.Count == 1) {
-                IDictionary < AFSummaryTypes, AFValue > oneValue = new IDictionary<AFSummaryTypes, AFValue>();
+            
+            if (values.Count != 1) {
+                AFTimeRange range = new AFTimeRange(values[0].Timestamp, values[values.Count - 1].Timestamp);
+                return values.Summary(range, AFSummaryTypes.Average | AFSummaryTypes.StdDev, AFCalculationBasis.EventWeighted, AFTimestampCalculation.MostRecentTime);
             }
-                  */
-            AFTimeRange range = new AFTimeRange(values[0].Timestamp, values[values.Count - 1].Timestamp);
-            return values.Summary(range, AFSummaryTypes.Average | AFSummaryTypes.StdDev, AFCalculationBasis.EventWeighted, AFTimestampCalculation.MostRecentTime);
+           else
+            {
+                IDictionary < AFSummaryTypes, AFValue > dict = new Dictionary<AFSummaryTypes, AFValue>();
+                dict[AFSummaryTypes.Average] = values[0];
+                dict[AFSummaryTypes.StdDev] = new AFValue(0, values[0].Timestamp);
+                return dict;
+            }
+           
         }
 
         internal static AFTime timeShift(AFValues values, AFTime startTime)
