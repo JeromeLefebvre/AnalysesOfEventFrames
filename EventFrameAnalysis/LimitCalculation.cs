@@ -7,6 +7,7 @@ using OSIsoft.AF.Asset;
 using OSIsoft.AF.Data;
 using OSIsoft.AF.PI;
 using OSIsoft.AF.Search;
+using System;
 
 namespace EventFrameAnalysis
 {
@@ -37,6 +38,39 @@ namespace EventFrameAnalysis
             InitialRun();
         }
 
+        internal AFValue performCalculation (string calculationName, AFValues slice)
+        {
+            IDictionary<AFSummaryTypes, AFValue> statisticForSlice = GetStatistics(slice);
+            AFTime time = statisticForSlice[AFSummaryTypes.Average].Timestamp;
+            double mean = statisticForSlice[AFSummaryTypes.Average].ValueAsDouble();
+            double stddev = statisticForSlice[AFSummaryTypes.StdDev].ValueAsDouble();
+            double maximum = statisticForSlice[AFSummaryTypes.Maximum].ValueAsDouble();
+            double minimum = statisticForSlice[AFSummaryTypes.Minimum].ValueAsDouble();
+            switch (calculationName)
+            {
+                case "μ + 3σ":
+                    return new AFValue(mean + 3 * stddev, time);
+                case "μ - 3σ":
+                    return new AFValue(mean - 3 * stddev, time);
+                case "μ + 2σ":
+                    return new AFValue(mean + 2 * stddev, time);
+                case "μ - 2σ":
+                    return new AFValue(mean - 2 * stddev, time);
+                case "μ + σ":
+                    return new AFValue(mean + stddev, time);
+                case "μ - σ":
+                    return new AFValue(mean - stddev, time);
+                case "μ":
+                    return new AFValue(mean, time);
+                case "maximum":
+                    return new AFValue(maximum, time);
+                case "minimum":
+                    return new AFValue(minimum, time);
+            }
+
+            return null;
+        }
+
         internal void InitialRun()
         {
             ComputeStatistics();
@@ -55,6 +89,7 @@ namespace EventFrameAnalysis
             List<AFValues> trends = new List<AFValues>();
             foreach (AFEventFrame EF in eventFrames)
             {
+                // To Do add cases in case the value is very bad
                 trends.Add(sensor.Data.InterpolatedValues(EF.TimeRange, interval, null, "", true));
             }
             List<AFValues> slices = GetSlices(trends);
@@ -63,12 +98,8 @@ namespace EventFrameAnalysis
             bounds[1].Clear();
             foreach (AFValues slice in slices)
             {
-                IDictionary<AFSummaryTypes, AFValue> statisticForSlice = GetStatistics(slice);
-                AFTime time = statisticForSlice[AFSummaryTypes.Average].Timestamp;
-                double mean = statisticForSlice[AFSummaryTypes.Average].ValueAsDouble();
-                double stddev = statisticForSlice[AFSummaryTypes.StdDev].ValueAsDouble();
-                bounds[0].Add(new AFValue(mean - 3 * stddev, time));
-                bounds[1].Add(new AFValue(mean + 3 * stddev, time));
+                bounds[0].Add(performCalculation("μ + 3σ", slice));
+                bounds[1].Add(performCalculation("μ + 3σ", slice));
             }
         }
 
@@ -88,16 +119,17 @@ namespace EventFrameAnalysis
             
             if (values.Count != 1) {
                 AFTimeRange range = new AFTimeRange(values[0].Timestamp, values[values.Count - 1].Timestamp);
-                return values.Summary(range, AFSummaryTypes.Average | AFSummaryTypes.StdDev, AFCalculationBasis.EventWeighted, AFTimestampCalculation.MostRecentTime);
+                return values.Summary(range, AFSummaryTypes.All, AFCalculationBasis.EventWeighted, AFTimestampCalculation.MostRecentTime);
             }
            else
             {
                 IDictionary < AFSummaryTypes, AFValue > dict = new Dictionary<AFSummaryTypes, AFValue>();
                 dict[AFSummaryTypes.Average] = values[0];
+                dict[AFSummaryTypes.Maximum] = values[0];
+                dict[AFSummaryTypes.Minimum] = values[0];
                 dict[AFSummaryTypes.StdDev] = new AFValue(0, values[0].Timestamp);
                 return dict;
             }
-           
         }
 
         internal static AFTime timeShift(AFValues values, AFTime startTime)
