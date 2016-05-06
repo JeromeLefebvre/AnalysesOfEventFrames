@@ -7,7 +7,7 @@ using OSIsoft.AF.Asset;
 using OSIsoft.AF.Data;
 using OSIsoft.AF.PI;
 using OSIsoft.AF.Search;
-using System;
+using LimitCalculatorSDK;
 
 namespace EventFrameAnalysis
 {
@@ -21,15 +21,33 @@ namespace EventFrameAnalysis
         private readonly AFEventFrameSearch eventFrameQuery;
         private readonly AFEventFrameSearch timeLessQuery;
         private readonly AFAttribute sensor;
-        private List<AFValues> bounds = new List<AFValues> { new AFValues(), new AFValues() };
-        private List<AFAttribute> boundAttributes;
+        //private List<AFValues> bounds = new List<AFValues> { new AFValues(), new AFValues() };
+        private Dictionary<AFAttributeTrait, AFValues> bounds = new Dictionary<AFAttributeTrait, AFValues> { };
 
-        public LimitCalculation(string afattributepath, string eventQuery)
+        //private List<AFAttribute> boundAttributes;
+        private Dictionary<AFAttributeTrait, AFAttribute> boundAttributes = new Dictionary<AFAttributeTrait, AFAttribute> { };
+
+        CalculationPreference preference;
+        Dictionary<AFAttributeTrait, string> calculationsToPerform;
+
+        public LimitCalculation(CalculationPreference preference)
         {
+            this.preference = preference;
+            string afattributepath = preference.sensorPath;
+            string eventQuery = preference.eventFrameQuery;
+            calculationsToPerform = preference.calculationsToPerform;
+
+            foreach (KeyValuePair<AFAttributeTrait, string> pair in preference.calculationsToPerform)
+            {
+                bounds[pair.Key] = new AFValues();
+            }
             sensor = AFAttribute.FindAttribute(afattributepath, null);
             pisystem = sensor.PISystem;
             afdatabse = sensor.Database;
-            boundAttributes = new List<AFAttribute> { sensor.GetAttributeByTrait(AFAttributeTrait.LimitLoLo), sensor.GetAttributeByTrait(AFAttributeTrait.LimitHiHi) };
+            foreach (KeyValuePair<AFAttributeTrait, string> pair in preference.calculationsToPerform)
+            {
+                boundAttributes[pair.Key] = sensor.GetAttributeByTrait(pair.Key);
+            }
 
             eventFrameQuery = new AFEventFrameSearch(afdatabse, "eventFrameSearch", eventQuery);
             List<AFSearchToken> tokens = eventFrameQuery.Tokens.ToList();
@@ -94,23 +112,28 @@ namespace EventFrameAnalysis
             }
             List<AFValues> slices = GetSlices(trends);
 
-            bounds[0].Clear();
-            bounds[1].Clear();
+            foreach (KeyValuePair<AFAttributeTrait, AFValues> bound in bounds)
+            {
+                bound.Value.Clear();
+            }
             foreach (AFValues slice in slices)
             {
-                bounds[0].Add(performCalculation("μ + 3σ", slice));
-                bounds[1].Add(performCalculation("μ + 3σ", slice));
+                foreach (KeyValuePair<AFAttributeTrait, AFValues> bound in bounds)
+                {
+                    bound.Value.Add(performCalculation(calculationsToPerform[bound.Key], slice));
+                }
             }
         }
 
         internal void WriteValues(AFTime startTime)
         {
             AFValue nodataValue = new AFValue(nodata);
-            for (int i = 0; i < 2; i++)
+            foreach (KeyValuePair<AFAttributeTrait, AFValues> boundPair in bounds)
             {
-                nodataValue.Timestamp = timeShift(bounds[i], startTime);
-                boundAttributes[i].PIPoint.UpdateValues(bounds[i], AFUpdateOption.Insert);
-                boundAttributes[i].PIPoint.UpdateValue(nodataValue, AFUpdateOption.Insert);
+                AFValues bound = boundPair.Value;
+                nodataValue.Timestamp = timeShift(bound, startTime);
+                boundAttributes[boundPair.Key].PIPoint.UpdateValues(bound, AFUpdateOption.Insert);
+                boundAttributes[boundPair.Key].PIPoint.UpdateValue(nodataValue, AFUpdateOption.Insert);
             }
         }
 

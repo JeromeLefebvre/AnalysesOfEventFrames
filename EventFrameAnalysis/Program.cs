@@ -22,6 +22,7 @@ using OSIsoft.AF.EventFrame;
 using OSIsoft.AF.Asset;
 using System.IO;
 using Newtonsoft.Json;
+using LimitCalculatorSDK;
 
 namespace EventFrameAnalysis
 {
@@ -61,7 +62,8 @@ namespace EventFrameAnalysis
 
             foreach (CalculationPreference pref in calculationPreferences)
             {
-                calculations.Add(new LimitCalculation(pref.sensorPath, pref.eventFrameQuery));
+                pref.nameToTrait();
+                calculations.Add(new LimitCalculation(pref));
             } 
 
             // Initialize the cookie (bookmark)
